@@ -12,6 +12,7 @@ class DLMEmulator {
 	private $errorMsg;
 	public $results;
 	public $verbose = false;
+	public $cache;
 	
 	public function btSearch(DLMInfo $info, $query, $maxresults = 0) {
 		/* Set up the local variables */
@@ -51,13 +52,49 @@ class DLMEmulator {
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
 		
-		$result = curl_exec($curl);
+		$isResultFromCache = false;
+		if (isset($this->cache)) {
+			/* Use the cache instead of executing a curl request */
+			if (file_exists($this->cache)) {
+				$result = file_get_contents($this->cache);
+				if (!$result) {
+					echo "Unable to read cache file (", $this->cache, ")\n";
+					exit(1);
+				}
+				$isResultFromCache = true;
+			} else {
+				/* Make the curl request and cache it */ 		
+				$result = curl_exec($curl);
+				$fp = fopen($this->cache, 'wb');
+				if (!$fp) {
+					echo "Unable to open cache file (", $this->cache, ")!\n";
+					var_dump(error_get_last());
+				} else {
+					if (!fwrite($fp, $result)) {
+						echo "Unable to write ", strlen($result), 
+							" bytes to cache file (", $this->cache, ")!\n";
+					} else if ($this->verbose) {
+						echo "Cache: ", strlen($result), " bytes written to ",
+							$this->cache, "\n";
+					}
+					fclose($fp);
+				}
+			}
+		} else {
+			/* If no cache, then make the cur request */
+			$result = curl_exec($curl);
+		}
+
 		if (!$result) {
-			echo "Curl error: " . curl_error($curl) . "\n";
+			echo "Curl error: ", curl_error($curl), "\n";
 		}
 		if ($this->verbose) {
-			echo "Query URL: " . curl_getinfo($curl, CURLINFO_EFFECTIVE_URL) . "\n";
-			echo "Website response code: " . curl_getinfo($curl, CURLINFO_RESPONSE_CODE) . "\n";
+			echo "Query URL: ", curl_getinfo($curl, CURLINFO_EFFECTIVE_URL),
+				($isResultFromCache ? " (not called -- cache used)" : ""), "\n";
+			if (!$isResultFromCache) {
+				echo "Website response code: ", 
+					curl_getinfo($curl, CURLINFO_RESPONSE_CODE), "\n";
+			}
 		}
 		curl_close($curl);
 		
@@ -70,14 +107,15 @@ class DLMEmulator {
 }
 
 /* Get the command line options */
-$shortoptions = "vc:o:s:";
-$longopts = array("verbose","count:","output:","search:");
+$shortoptions = "vc:m:o:s:";
+$longopts = array("verbose","cache:","max:","output:","search:");
 $options = getopt($shortoptions, $longopts);
 
 /* Validate the command line options */
 if (!$options) {
 	$fatalError = true;
 } else {
+	/* Extract the DLM INFO filename (the last command line option) */
 	$dlmFilename = $argv[$argc-1];
 	if (!file_exists($dlmFilename)) {
 		$dlmDefaultUsed = true;
@@ -91,8 +129,10 @@ if (!$options) {
 		echo "DLM_INFO_file '$dlmFilename' not found.\n\n";
 	}
 
+	/* Extract the verbose option */
 	$verbose = (key_exists('v', $options) || key_exists('verbose', $options));
 
+	/* Extract the output format option */
 	$valid_output = array("ARRAY","JSON", "JSON_PRETTY");
 	if (key_exists('o', $options)) {
 		$output = strtoupper($options['o']);
@@ -103,15 +143,30 @@ if (!$options) {
 		$output = $valid_output[0];
 	}
 
+	/* Extract the cache option */
+	$cache_dir = "./cache/";
 	if (key_exists('c', $options)) {
-		$maxresults = (int)$options['c'];
+		$cache = $cache_dir . $options['c'];
+	} else if (key_exists('cache', $options)) {
+		$cache = $cache_dir . $options['cache'];
+	}
+	/* Make sure the cache directory exists */
+	if (isset($cache) && !file_exists($cache_dir) && !mkdir($cache_dir, 0700, true)) {
+		echo "Unable to make cache directory: $cache_dir\n";
+		exit(1);
+	}
+
+	/* Extract the max results option */
+	if (key_exists('m', $options)) {
+		$maxresults = (int)$options['m'];
 	} else if (key_exists('count', $options)) {
-		$maxresults = (int)$options['count'];
+		$maxresults = (int)$options['max'];
 	}
 	if (!isset($maxresults)) {
 		$maxresults = -1;
 	}
 	
+	/* Extract the search string options */
 	if (key_exists('s', $options)) {
 		$query = $options['s'];
 	} else if (key_exists('search', $options)) {
@@ -119,6 +174,7 @@ if (!$options) {
 	} else {
 		$query = NULL;
 	}
+	/* Validate the search string (it must exist and there must only be one) */
 	if (is_null($query)) {
 		$fataError = true;
 		echo "No search argument specified.\n\n";
@@ -131,11 +187,12 @@ if (!$options) {
 
 /* Return usage instructions if there's a fatal command line error */
 if (isset($fatalError)) {
-?>Usage: DLMEmulator [-c max_results] [-o output_format] -s search_text DLM_INFO_file
+?>Usage: DLMEmulator [-c cache_file] [-m max_results] [-o output_format] -s search_text DLM_INFO_file
 
 	If DLM_INFO_file is not specified, then 'INFO' in the current directory will be used.
 
-	-c, --count:	Max results, if search module contains public variable 'max_results'
+	-c, --cache: 	Save results to, or use (if files exists), a cache (in ./cache dir)
+	-m, --max:	Max results, if search module contains public variable 'max_results'
 	-o, --output:	Output format (default is PHP 'array'): array, JSON, JSON_pretty
 	-s, --search: 	[MANDATORY] Search query to pass to the DLM module
 	-v, --verbose:	Output is verbose
@@ -147,6 +204,12 @@ if (isset($fatalError)) {
 if ($verbose) {
 	echo "User-specified query: $query\n";
 	echo "User-specified format: $output\n";
+	if (isset($cache)) {
+		echo "User-specified cache: $cache (", 
+			(file_exists($cache) ? 
+				"exists and will be used" : 
+				"does not exist and will be created"), ")\n";
+	}
 }
 
 $dlmInfo = new DLMInfo($dlmFilename);
@@ -158,6 +221,7 @@ if (!$dlmInfo->isWellFormed) {
 /* Run the DLM Search Emulator */
 $emulator = new DLMEmulator();
 $emulator->verbose = $verbose;
+$emulator->cache = $cache;
 $emulator->btSearch($dlmInfo, $query, $maxresults);
 
 /* Dump the results */
