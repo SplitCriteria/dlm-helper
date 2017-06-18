@@ -12,7 +12,38 @@ class DLMEmulator {
 	private $errorMsg;
 	public $results;
 	public $verbose = false;
-	
+
+	private function createCountArray() {
+		return array(
+			"title" => 0,
+			"download" => 0,
+			"size" => 0, 
+			"date" => 0,
+			"page" => 0,
+			"hash" => 0,
+			"seeds" => 0,
+			"leechs" => 0,
+			"category" => 0);
+	}
+
+	private function sumCountArray($ca) {
+		return $ca['title'] + $ca['download'] + $ca['size'] +
+			$ca['date'] + $ca['page'] + $ca['hash'] +
+			$ca['seeds'] + $ca['leechs'] + $ca['category'];
+	}
+
+	private function printCountArray($ca) {
+		echo $ca['title'] > 0 ? ($ca['title'] . "x Title ") : "", 
+			$ca['download'] > 0 ? ($ca['download'] . "x Download ") : "",
+			$ca['size'] > 0 ? ($ca['size'] . "x Size ") : "",
+			$ca['date'] > 0 ? ($ca['date'] . "x Date ") : "",
+			$ca['page'] > 0 ? ($ca['page'] . "x Page ") : "",
+			$ca['hash'] > 0 ? ($ca['hash'] . "x Hash ") : "",
+			$ca['seeds'] > 0 ? ($ca['seeds'] . "x Seeds ") : "",
+			$ca['leechs'] > 0 ? ($ca['leechs'] . "x Leechs ") : "",
+			$ca['category'] > 0 ? ($ca['category'] . "x Category ") : "";
+	} 
+
 	public function btSearch(DLMInfo $info, $query, $maxresults = 0) {
 		/* Set up the local variables */
 		$error = &$this->isError;
@@ -66,6 +97,96 @@ class DLMEmulator {
 		$plugin = new DLMPlugin();
 		$searchClass->$parseFunc($plugin, $result);
 		$this->results = $plugin->results;
+
+		/* Check the results */
+		date_default_timezone_set("UTC"); /* Needed to use strtotime() without a warning */
+		$totalCount = count($this->results);
+		$validCount = 0;
+		$regxURL = "/^(https?:\/\/)?([\w\.\-\?\[\]\$\(\)\*\+\/#@!&',:;~=_%]+)+$/";
+		$regxMagnet = "/^magnet:\?xt=urn:(\w+):([a-zA-Z0-9]{40})&dn=([\w\.\-\?\[\]\$\(\)\*\+\/#@!&',:;~=_%]+)$";
+		$regxHash = "/^[a-zA-Z0-9]{40}$/";
+		$regxInt = "/^[0-9]+$/";
+		$emptyFields = $this->createCountArray();
+		$invalidFields = $this->createCountArray();
+		/* Check for properly formatted fields */
+		foreach ($this->results as $result) {
+			/* Assume the result is valid */
+			$invalid = false;
+			/* Check the title field -- basically could be anything */
+			if (empty($result['title'])) {
+				$emptyFields['title']++;
+				$invalidFields['title']++;
+				$invalid = true;
+			}
+			/* Check the download URL */
+			if (empty($result['download'])) {
+				$emptyFields['download']++;
+				/* Empty also means invalid, but if the URL is empty, it will 
+				   also fail the preg_match below which flags as invalid.  */
+			}
+			if (!(preg_match($regxURL, $result['download']) || preg_match($regxMagnet, $result['download']))) {	
+				$invalidFields['download']++;
+				$invalid = true;
+			}
+			/* Check the size field (integer or float are valid) */
+			if (empty($result['size'])) {
+				$emptyFields['size']++;
+			} else if (!(is_int($result['size']) || is_float($result['size']))) {
+				$invalidFields['size']++;
+				$invalid = true;
+			}
+			/* Check the date/time field -- check with php strtotime function */
+			if (empty($result['date'])) {
+				$emptyFields['date']++;
+			} /* else if (!strtotime($result['date'])) {
+				$invalidFields['date']++;
+				$invalid = true;
+			} */
+			/* Check the page URL */
+			if (empty($result['page'])) {
+				$emptyFields['page']++;
+			} else if (!preg_match($regxURL, $result['page'])) {
+				$invalidFields['page']++;
+				$invalid = true;
+			}
+			/* Check the hash variable */
+			if (empty($result['hash'])) {
+				$emptyFields['hash']++;
+			} else if (!preg_match($regxHash, $result['hash'])) {
+				$invalidFields['hash']++;
+				$invalid = true;
+			}
+			/* Check the seeds and leechs fields */
+			if (empty($result['seeds'])) {
+				$emptyFields['seeds']++;
+			} else if (!(is_int($result['seeds']) || preg_match($regxInt, $result['seeds']))) {
+				$invalidFields['seeds']++;
+				$invalid = true;
+			} 
+			if (empty($result['leechs'])) {
+				$emptyFields['leechs']++;
+			} else if (!(is_int($result['leechs']) || preg_match($regxInt, $result['leechs']))) {
+				$invalidFields['leechs']++;
+				$invalid = true;
+			}
+			/* The category field really doesn't have a restriction */
+			if (empty($result['category'])) {
+				$emptyFields['category']++;
+			} 
+			/* Total results */
+			if (!$invalid) {
+				$validCount++;
+			}
+		}
+		/* Print the results to the user */
+		echo "Search module returned $totalCount results ($validCount of $totalCount appear to be valid).\n";
+		if ($validCount < $totalCount) {
+			echo "Invalid Fields (", $this->sumCountArray($invalidFields), " found): ", $this->printCountArray($invalidFields), "\n";
+		}
+		$emptyFieldCount = $this->sumCountArray($emptyFields);
+		if ($emptyFieldCount > 0) {
+			echo "Empty Fields ($emptyFieldCount found): ", $this->printCountArray($emptyFields), "\n";
+		}
 	}
 }
 
@@ -99,8 +220,11 @@ if (!$options) {
 	} else if (key_exists('output', $options)) {
 		$output = strtoupper($options['output']);
 	}
-	if (!isset($output) || !in_array($output, $valid_output)) {
-		$output = $valid_output[0];
+	if (!isset($output)) {
+		$output = NULL;
+	} else if (!in_array($output, $valid_output)) {
+		echo "Invalid output format: $output\n";
+		exit(1);
 	}
 
 	if (key_exists('c', $options)) {
@@ -126,7 +250,6 @@ if (!$options) {
 		$query = $query[0];
 		echo $argv[0] . " only accepts a single search parameter. '$query' used.\n\n";
 	}
-
 }
 
 /* Return usage instructions if there's a fatal command line error */
@@ -170,8 +293,7 @@ switch ($output) {
 		break;
 	case "JSON_PRETTY":
 		echo json_encode($emulator->results, JSON_PRETTY_PRINT);
-		break;
-		
+		break;		
 }
 echo "\n";
 ?>
