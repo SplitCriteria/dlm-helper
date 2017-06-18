@@ -175,10 +175,11 @@ class DLMEmulator {
 			/* Check the date/time field -- check with php strtotime function */
 			if (empty($result['date'])) {
 				$emptyFields['date']++;
-			} /* else if (!strtotime($result['date'])) {
+			/* Call to common.php isDateValid(String) */
+			} else if (!isDateValid($result['date'])) {
 				$invalidFields['date']++;
 				$invalid = true;
-			} */
+			}
 			/* Check the page URL */
 			if (empty($result['page'])) {
 				$emptyFields['page']++;
