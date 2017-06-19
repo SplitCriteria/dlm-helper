@@ -137,7 +137,6 @@ class DLMEmulator {
 
 		/* Check the results */
 		date_default_timezone_set("UTC"); /* Needed to use strtotime() without a warning */
-		$totalCount = count($this->results);
 		$validCount = 0;
 		$regxURL = "/^(https?:\/\/)?([\w\.\-\?\[\]\$\(\)\*\+\/#@!&',:;~=_%]+)+$/";
 		$regxMagnet = "/^magnet:\?xt=urn:(\w+):([a-zA-Z0-9]{40})&dn=([\w\.\-\?\[\]\$\(\)\*\+\/#@!&',:;~=_%]+)$";
@@ -146,7 +145,12 @@ class DLMEmulator {
 		$emptyFields = $this->createCountArray();
 		$invalidFields = $this->createCountArray();
 		/* Check for properly formatted fields */
+		$count = 0;
 		foreach ($this->results as $result) {
+			if ($this->verbose) {
+				echo "Result #$count:\n";
+			}
+			
 			/* Assume the result is valid */
 			$invalid = false;
 			/* Check the title field -- basically could be anything */
@@ -154,7 +158,12 @@ class DLMEmulator {
 				$emptyFields['title']++;
 				$invalidFields['title']++;
 				$invalid = true;
+				echo ConsoleText::RED_BOLD;
 			}
+			if ($this->verbose) {
+				echo "\tTitle: ", $result['title'], ConsoleText::NORMAL, "\n";
+			}
+
 			/* Check the download URL */
 			if (empty($result['download'])) {
 				$emptyFields['download']++;
@@ -164,14 +173,24 @@ class DLMEmulator {
 			if (!(preg_match($regxURL, $result['download']) || preg_match($regxMagnet, $result['download']))) {	
 				$invalidFields['download']++;
 				$invalid = true;
+				echo ConsoleText::RED_BOLD;
 			}
+			if ($this->verbose) {
+				echo "\tTorrent URL: ", $result['download'], ConsoleText::NORMAL, "\n";
+			}
+		
 			/* Check the size field (integer or float are valid) */
 			if (empty($result['size'])) {
 				$emptyFields['size']++;
 			} else if (!(is_int($result['size']) || is_float($result['size']))) {
 				$invalidFields['size']++;
 				$invalid = true;
+				echo ConsoleText::RED_BOLD;
 			}
+			if ($this->verbose) {
+				echo "\tSize: ", $result['size'], ConsoleText::NORMAL, "\n";
+			}
+
 			/* Check the date/time field -- check with php strtotime function */
 			if (empty($result['date'])) {
 				$emptyFields['date']++;
@@ -179,46 +198,76 @@ class DLMEmulator {
 			} else if (!isDateValid($result['date'])) {
 				$invalidFields['date']++;
 				$invalid = true;
+				echo ConsoleText::RED_BOLD;
 			}
+			if ($this->verbose) {
+				echo "\tDate: ", $result['date'], ConsoleText::NORMAL, "\n";
+			}
+
 			/* Check the page URL */
 			if (empty($result['page'])) {
 				$emptyFields['page']++;
 			} else if (!preg_match($regxURL, $result['page'])) {
 				$invalidFields['page']++;
 				$invalid = true;
+				echo ConsoleText::RED_BOLD;
 			}
+			if ($this->verbose) {
+				echo "\tDetails URL: ", $result['page'], ConsoleText::NORMAL, "\n";
+			}
+
 			/* Check the hash variable */
 			if (empty($result['hash'])) {
 				$emptyFields['hash']++;
 			} else if (!preg_match($regxHash, $result['hash'])) {
 				$invalidFields['hash']++;
 				$invalid = true;
+				echo ConsoleText::RED_BOLD;
 			}
+			if ($this->verbose) {
+				echo "\tHash: ", $result['hash'], ConsoleText::NORMAL, "\n";
+			}
+
 			/* Check the seeds and leechs fields */
 			if (empty($result['seeds'])) {
 				$emptyFields['seeds']++;
 			} else if (!(is_int($result['seeds']) || preg_match($regxInt, $result['seeds']))) {
 				$invalidFields['seeds']++;
 				$invalid = true;
-			} 
+				echo ConsoleText::RED_BOLD;
+			}
+			if ($this->verbose) { 
+				echo "\tSeeds: ", $result['seeds'], ConsoleText::NORMAL, "\n";
+			}
+
 			if (empty($result['leechs'])) {
 				$emptyFields['leechs']++;
 			} else if (!(is_int($result['leechs']) || preg_match($regxInt, $result['leechs']))) {
 				$invalidFields['leechs']++;
 				$invalid = true;
+				echo ConsoleText::RED_BOLD;
 			}
+			if ($this->verbose) {
+				echo "\tLeechs: ", $result['leechs'], ConsoleText::NORMAL, "\n";
+			}
+
 			/* The category field really doesn't have a restriction */
 			if (empty($result['category'])) {
 				$emptyFields['category']++;
-			} 
+			}
+			if ($this->verbose) { 
+				echo "\tCategory: ", $result['category'], ConsoleText::NORMAL, "\n";
+			}
+
 			/* Total results */
 			if (!$invalid) {
 				$validCount++;
 			}
+			$count++;
 		}
 		/* Print the results to the user */
-		echo "Search module returned $totalCount results ($validCount of $totalCount appear to be valid).\n";
-		if ($validCount < $totalCount) {
+		echo "Search module returned $count results ($validCount of $count appear to be valid).\n";
+		if ($validCount < $count) {
 			echo "Invalid Fields (", $this->sumCountArray($invalidFields), " found): ", $this->printCountArray($invalidFields), "\n";
 		}
 		$emptyFieldCount = $this->sumCountArray($emptyFields);
@@ -319,7 +368,7 @@ if (isset($fatalError)) {
 	-m, --max:	Max results, if search module contains public variable 'max_results'
 	-o, --output:	Output format (default is PHP 'array'): array, JSON, JSON_pretty
 	-s, --search: 	[MANDATORY] Search query to pass to the DLM module
-	-v, --verbose:	Output is verbose
+	-v, --verbose:	Output is verbose; includes suspected errors
 
 <?php
 	exit;
