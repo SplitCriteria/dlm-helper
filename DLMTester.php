@@ -85,31 +85,51 @@ class DLMEmulator {
 		
 		$isResultFromCache = false;
 		if (isset($this->cache)) {
+			
+			/* Set the names of the info and cache file. The info file
+			   will contain the initial cache date, the search criteria,
+			   and other important information about the cache. */
+			$cacheInfo = $this->cache . ".info";
+			/* The cache file will contain the returned results */
+			$cacheFile = $this->cache . ".cache";
+
 			/* Use the cache instead of executing a curl request */
-			if (file_exists($this->cache)) {
-				$result = file_get_contents($this->cache);
+			if (file_exists($cacheFile) && file_exists($cacheInfo)) {
+				$info = file($cacheInfo);
+				if (!$info) {
+					echo "Unable to read cache info file (", $cacheInfo, ")\n";
+					exit(1);
+				}
+				$result = file_get_contents($cacheFile);
 				if (!$result) {
-					echo "Unable to read cache file (", $this->cache, ")\n";
+					echo "Unable to read cache file (", $cacheFile, ")\n";
 					exit(1);
 				}
 				$isResultFromCache = true;
 			} else {
 				/* Make the curl request and cache it */ 		
 				$result = curl_exec($curl);
-				$fp = fopen($this->cache, 'wb');
-				if (!$fp) {
-					echo "Unable to open cache file (", $this->cache, ")!\n";
+				$fpCache = fopen($cacheFile, 'wb');
+				$fpInfo = fopen($cacheInfo, 'wb');
+				if (!$fpCache) {
+					echo "Unable to open cache file (", $cacheFile, ")!\n";
+					var_dump(error_get_last());
+				} else if (!$fpInfo) {
+					echo "Unable to open cache info file (", $cacheInfo, ")!\n";
 					var_dump(error_get_last());
 				} else {
-					if (!fwrite($fp, $result)) {
+					if (!fwrite($fpCache, $result)) {
 						echo "Unable to write ", strlen($result), 
-							" bytes to cache file (", $this->cache, ")!\n";
+							" bytes to cache file (", $cacheFile, ")!\n";
 					} else if ($this->verbose) {
 						echo "Cache: ", strlen($result), " bytes written to ",
-							$this->cache, "\n";
+							$cacheFile, "\n";
 					}
-					fclose($fp);
+					/* Cache info about the request */
+					
 				}
+				fclose($fpCache);
+				fclose($fpInfo);
 			}
 		} else {
 			/* If no cache, then make the cur request */
