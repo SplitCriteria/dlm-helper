@@ -1,12 +1,12 @@
 <?php
-namespace BoogsDLM;
+namespace SplitCriteria\DLMHelper;
 use \Exception;
 
 include_once('common.php');
 include_once('DLMInfo.php');
 include_once('DLMPlugin.php');
 
-class DLMEmulator {
+class DLMTester {
 
 	private $isError;
 	private $errorMsg;
@@ -265,6 +265,8 @@ class DLMEmulator {
 			}
 			$count++;
 		}
+		/* Reset the console text color */
+		echo ConsoleText::NORMAL;
 		/* Print the results to the user */
 		echo "Search module returned $count results ($validCount of $count appear to be valid).\n";
 		if ($validCount < $count) {
@@ -273,6 +275,11 @@ class DLMEmulator {
 		$emptyFieldCount = $this->sumCountArray($emptyFields);
 		if ($emptyFieldCount > 0) {
 			echo "Empty Fields ($emptyFieldCount found): ", $this->printCountArray($emptyFields), "\n";
+		}
+		/* Give the user some help if they have invalid results and didn't ask to look at them */
+		if (!$this->verbose && $validCount != $count) {
+			echo ConsoleText::RED_BOLD, "Invalid results are highlighted by using option -v, --verbose\n", 
+				ConsoleText::NORMAL;
 		}
 	}
 }
@@ -360,7 +367,7 @@ if (!$options) {
 
 /* Return usage instructions if there's a fatal command line error */
 if (isset($fatalError)) {
-?>Usage: DLMEmulator [-c cache_file] [-m max_results] [-o output_format] -s search_text DLM_INFO_file
+?>Usage: php DLMTester.php [-c cache_file] [-m max_results] [-o output_format] -s search_text DLM_INFO_file
 
 	If DLM_INFO_file is not specified, then 'INFO' in the current directory will be used.
 
@@ -391,22 +398,22 @@ if (!$dlmInfo->isWellFormed) {
 	exit;
 }
 
-/* Run the DLM Search Emulator */
-$emulator = new DLMEmulator();
-$emulator->verbose = $verbose;
-$emulator->cache = $cache;
-$emulator->btSearch($dlmInfo, $query, $maxresults);
+/* Run the DLM Search Tester */
+$tester = new DLMTester();
+$tester->verbose = $verbose;
+$tester->cache = $cache;
+$tester->btSearch($dlmInfo, $query, $maxresults);
 
 /* Dump the results */
 switch ($output) {
 	case "ARRAY":
-		var_dump($emulator->results);
+		var_dump($tester->results);
 		break;
 	case "JSON":
-		echo json_encode($emulator->results);
+		echo json_encode($tester->results);
 		break;
 	case "JSON_PRETTY":
-		echo json_encode($emulator->results, JSON_PRETTY_PRINT);
+		echo json_encode($tester->results, JSON_PRETTY_PRINT);
 		break;		
 }
 echo "\n";

@@ -1,5 +1,5 @@
 <?php
-namespace BoogsDLM;
+namespace SplitCriteria\DLMHelper;
 use \Exception;
 
 /**
