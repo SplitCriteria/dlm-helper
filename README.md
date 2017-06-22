@@ -10,8 +10,6 @@ php DLMTester.php
 
 Sample DLMs are available in the `sampleDLMs/` folder.
 
-Recommendations for 
-
 ## DLMHelper.sh
 DLMHelper.sh is a Bash script which allows the user to:
 
