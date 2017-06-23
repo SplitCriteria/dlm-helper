@@ -3,8 +3,7 @@ namespace SplitCriteria\DLMHelper;
 
 interface ResultViewer {
 
-	public function __construct(Result $result);
-	public function echoResult();
+	public static function echoResults(array $results);
 
 }
 

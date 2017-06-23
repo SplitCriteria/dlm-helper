@@ -8,6 +8,8 @@ include_once('DLMPlugin.php');
 include_once('Cache.php');
 include_once('Result.php');
 include_once('ResultMetrics.php');
+include_once('ConsoleResultViewer.php');
+include_once('ConsoleText.php');
 
 class DLMTester {
 
@@ -99,7 +101,7 @@ class DLMTester {
 		$searchClass->$parseFunc($plugin, $result);
 		$this->results = $plugin->results;
 
-		/* Copy the raw results into an array of Result object */
+		/* Copy the raw results into an array of Result objects */
 		$results = array();
 		foreach ($this->results as $result) {
 			$results[] = new Result($result);
@@ -112,9 +114,6 @@ class DLMTester {
 		$invalidFields = ResultMetrics::getInvalidFieldCount($results);
 		$emptyFields = ResultMetrics::getEmptyFieldCount($results);
 
-		echo "Invalid Fields\n"; var_dump($invalidFields); echo "\n";
-		echo "Empty Fields\n"; var_dump($emptyFields); echo "\n";
-
 		echo "Search module returned $count results ($validCount of $count appear to be valid).\n";
 		if ($validCount < $count) {
 			echo "Invalid Fields (", ($count - $validCount), " found): ", 
@@ -124,6 +123,11 @@ class DLMTester {
 			echo "Empty Fields ($emptyCount found): ", 
 				ResultMetrics::echoFieldCountArray($emptyFields), "\n";
 		}
+
+		if ($this->verbose) {
+			ConsoleResultViewer::echoResults($results);
+		}
+
 		/* Give the user some help if they have invalid results and didn't ask to look at them */
 		if (!$this->verbose && $validCount != $count) {
 			echo ConsoleText::RED_BOLD, "Invalid results are highlighted by using option -v, --verbose\n", 

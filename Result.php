@@ -14,6 +14,11 @@ define("CATEGORY", "category");
 
 class Result {
 
+	const REGX_URL = "/^(https?:\/\/)?([\w\.\-\?\[\]\$\(\)\*\+\/#@!&',:;~=_%]+)+$/";
+	const REGX_MAGNET = "/^magnet:\?xt=urn:(\w+):([a-zA-Z0-9]{40})&dn=([\w\.\-\?\[\]\$\(\)\*\+\/#@!&',:;~=_%]+)$";
+	const REGX_HASH = "/^[a-zA-Z0-9]{40}$/";
+	const REGX_INT = "/^[0-9]+$/";
+	
 	private $result;
 
 	public function __construct($ra) {
@@ -88,7 +93,16 @@ class Result {
 
 	public function isEmpty($field) {
 		if (Result::isValidField($field)) {
-			return empty($this->result[$field]);
+			switch ($field) {
+				/* Numeric fields "incorrectly" reported as empty are checked */
+				case SEEDS:
+				case LEECHS:
+				case SIZE:
+					return $this->result[$field] != "0" &&
+						empty($this->result[$field]);
+				default:
+					return empty($this->result[$field]);
+			}
 		} else {
 			return false;
 		}
@@ -106,47 +120,40 @@ class Result {
 		if (!Result::isValidField($field)) {
 			return false;
 		}
-		
-		$regxURL = "/^(https?:\/\/)?([\w\.\-\?\[\]\$\(\)\*\+\/#@!&',:;~=_%]+)+$/";
-		$regxMagnet = "/^magnet:\?xt=urn:(\w+):([a-zA-Z0-9]{40})&dn=([\w\.\-\?\[\]\$\(\)\*\+\/#@!&',:;~=_%]+)$";
-		$regxHash = "/^[a-zA-Z0-9]{40}$/";
-		$regxInt = "/^[0-9]+$/";
-		
+			
 		switch ($field) {
 			case TITLE:
 				/* Valid titles just need to have some text */
 				return !empty($this->result[TITLE]);
 			case DOWNLOAD:
 				return !empty($this->result[DOWNLOAD]) &&
-					(preg_match($regxURL, $this->result[DOWNLOAD]) || 
-					preg_match($regxMagnet, $this->result[DOWNLOAD]));
+					(preg_match(self::REGX_URL, $this->result[DOWNLOAD]) || 
+					preg_match(self::REGX_MAGNET, $this->result[DOWNLOAD]));
 			case SIZE:
 				return !empty($this->result[SIZE]) &&
 					(is_int($this->result[SIZE]) || 
 					is_float($this->result[SIZE]));
 			case DATE:
-				/* Set a default timezone to suppress warnings */
-				date_default_timezone_set("UTC");
 				/* Check with php function strtotime and DateTime::createFromFormat -- since
 				   strtotime doesn't understand all date formats. */
-				$result = strtotime($this->result[DATE]);
+				$result = @strtotime($this->result[DATE]);
 				return (($result && $result != -1)
 					|| \DateTime::createFromFormat("m-d-Y", $this->result[DATE])
 					|| \DateTime::createFromFormat("m/d/Y", $this->result[DATE]));
 			case PAGE:
 				return !empty($this->result[PAGE]) &&
-					preg_match($regxURL, $this->result[PAGE]);
+					preg_match(self::REGX_URL, $this->result[PAGE]);
 			case HASH:
 				return !empty($this->result[HASH]) &&
-					preg_match($regxHash, $this->result[HASH]);
+					preg_match(self::REGX_HASH, $this->result[HASH]);
 			case SEEDS:
-				return !empty($this->result[SEEDS]) &&
-					(is_int($this->result[SEEDS]) 
-					|| preg_match($regxInt, $this->result[SEEDS]));
+				return is_int($this->result[SEEDS]) || 
+					$this->result[SEEDS] == "0" ||
+					preg_match(self::REGX_INT, $this->result[SEEDS]);
 			case LEECHS:
-				return !empty($this->result[LEECHS]) &&
-					(is_int($this->result[LEECHS]) 
-					|| preg_match($regxInt, $this->result[LEECHS]));
+				return is_int($this->result[LEECHS]) || 
+					$this->result[LEECHS] == "0" ||
+					preg_match(self::REGX_INT, $this->result[LEECHS]);
 			case CATEGORY:
 				/* All category results are valid */
 				return true;

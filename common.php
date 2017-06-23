@@ -1,6 +1,5 @@
 <?php
 namespace SplitCriteria\DLMHelper;
-use \Exception;
 
 /**
 	Appends the right string to the left string on a new line.
@@ -39,11 +38,4 @@ function isDateValid($date) {
 	return $isValid;
 }
 
-/***
- Includes some bash console color coding
-*/
-class ConsoleText {
-	const RED_BOLD = "\033[1;31m";
-	const NORMAL = "\033[0m";
-}
 ?>

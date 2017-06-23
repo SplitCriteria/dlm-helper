@@ -27,7 +27,9 @@ DLMTester.php is a command line PHP program which allows users to test unpacked,
 
 To test DLM files, enter a search parameter on the command line. The parsed results will be output to stdout. The user will need to examine the results for accuracy.
 
-	`php DLMTester.php -cvs "Search String" DLM_INFO_file`
+```
+php DLMTester.php -cvs "Search String" DLM_INFO_file
+```
 
 Planned updates:
 - [x] Validate DLM search file results (e.g. check that fields are present and correct format)
