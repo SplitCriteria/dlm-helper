@@ -4,7 +4,7 @@ use \Exception;
 
 class Cache {
 
-	const DEBUG = true;
+	const DEBUG = false;
 	const DEFAULT_CACHE_DIR = "cache";
 	const KEY_FILENAME = "keys";
 

@@ -6,6 +6,8 @@ include_once('common.php');
 include_once('DLMInfo.php');
 include_once('DLMPlugin.php');
 include_once('Cache.php');
+include_once('Result.php');
+include_once('ResultMetrics.php');
 
 class DLMTester {
 
@@ -14,37 +16,6 @@ class DLMTester {
 	public $results;
 	public $verbose = false;
 	public $useCache;
-
-	private function createCountArray() {
-		return array(
-			"title" => 0,
-			"download" => 0,
-			"size" => 0, 
-			"date" => 0,
-			"page" => 0,
-			"hash" => 0,
-			"seeds" => 0,
-			"leechs" => 0,
-			"category" => 0);
-	}
-
-	private function sumCountArray($ca) {
-		return $ca['title'] + $ca['download'] + $ca['size'] +
-			$ca['date'] + $ca['page'] + $ca['hash'] +
-			$ca['seeds'] + $ca['leechs'] + $ca['category'];
-	}
-
-	private function printCountArray($ca) {
-		echo $ca['title'] > 0 ? ($ca['title'] . "x Title ") : "", 
-			$ca['download'] > 0 ? ($ca['download'] . "x Download ") : "",
-			$ca['size'] > 0 ? ($ca['size'] . "x Size ") : "",
-			$ca['date'] > 0 ? ($ca['date'] . "x Date ") : "",
-			$ca['page'] > 0 ? ($ca['page'] . "x Page ") : "",
-			$ca['hash'] > 0 ? ($ca['hash'] . "x Hash ") : "",
-			$ca['seeds'] > 0 ? ($ca['seeds'] . "x Seeds ") : "",
-			$ca['leechs'] > 0 ? ($ca['leechs'] . "x Leechs ") : "",
-			$ca['category'] > 0 ? ($ca['category'] . "x Category ") : "";
-	} 
 
 	public function btSearch(DLMInfo $info, $query, $maxresults = 0) {
 		/* Set up the local variables */
@@ -128,146 +99,30 @@ class DLMTester {
 		$searchClass->$parseFunc($plugin, $result);
 		$this->results = $plugin->results;
 
-		/* Check the results */
-		date_default_timezone_set("UTC"); /* Needed to use strtotime() without a warning */
-		$validCount = 0;
-		$regxURL = "/^(https?:\/\/)?([\w\.\-\?\[\]\$\(\)\*\+\/#@!&',:;~=_%]+)+$/";
-		$regxMagnet = "/^magnet:\?xt=urn:(\w+):([a-zA-Z0-9]{40})&dn=([\w\.\-\?\[\]\$\(\)\*\+\/#@!&',:;~=_%]+)$";
-		$regxHash = "/^[a-zA-Z0-9]{40}$/";
-		$regxInt = "/^[0-9]+$/";
-		$emptyFields = $this->createCountArray();
-		$invalidFields = $this->createCountArray();
-		/* Check for properly formatted fields */
-		$count = 0;
+		/* Copy the raw results into an array of Result object */
+		$results = array();
 		foreach ($this->results as $result) {
-			if ($this->verbose) {
-				echo "Result #$count:\n";
-			}
-			
-			/* Assume the result is valid */
-			$invalid = false;
-			/* Check the title field -- basically could be anything */
-			if (empty($result['title'])) {
-				$emptyFields['title']++;
-				$invalidFields['title']++;
-				$invalid = true;
-				echo ConsoleText::RED_BOLD;
-			}
-			if ($this->verbose) {
-				echo "\tTitle: ", $result['title'], ConsoleText::NORMAL, "\n";
-			}
-
-			/* Check the download URL */
-			if (empty($result['download'])) {
-				$emptyFields['download']++;
-				/* Empty also means invalid, but if the URL is empty, it will 
-				   also fail the preg_match below which flags as invalid.  */
-			}
-			if (!(preg_match($regxURL, $result['download']) || preg_match($regxMagnet, $result['download']))) {	
-				$invalidFields['download']++;
-				$invalid = true;
-				echo ConsoleText::RED_BOLD;
-			}
-			if ($this->verbose) {
-				echo "\tTorrent URL: ", $result['download'], ConsoleText::NORMAL, "\n";
-			}
-		
-			/* Check the size field (integer or float are valid) */
-			if (empty($result['size'])) {
-				$emptyFields['size']++;
-			} else if (!(is_int($result['size']) || is_float($result['size']))) {
-				$invalidFields['size']++;
-				$invalid = true;
-				echo ConsoleText::RED_BOLD;
-			}
-			if ($this->verbose) {
-				echo "\tSize: ", $result['size'], ConsoleText::NORMAL, "\n";
-			}
-
-			/* Check the date/time field -- check with php strtotime function */
-			if (empty($result['date'])) {
-				$emptyFields['date']++;
-			/* Call to common.php isDateValid(String) */
-			} else if (!isDateValid($result['date'])) {
-				$invalidFields['date']++;
-				$invalid = true;
-				echo ConsoleText::RED_BOLD;
-			}
-			if ($this->verbose) {
-				echo "\tDate: ", $result['date'], ConsoleText::NORMAL, "\n";
-			}
-
-			/* Check the page URL */
-			if (empty($result['page'])) {
-				$emptyFields['page']++;
-			} else if (!preg_match($regxURL, $result['page'])) {
-				$invalidFields['page']++;
-				$invalid = true;
-				echo ConsoleText::RED_BOLD;
-			}
-			if ($this->verbose) {
-				echo "\tDetails URL: ", $result['page'], ConsoleText::NORMAL, "\n";
-			}
-
-			/* Check the hash variable */
-			if (empty($result['hash'])) {
-				$emptyFields['hash']++;
-			} else if (!preg_match($regxHash, $result['hash'])) {
-				$invalidFields['hash']++;
-				$invalid = true;
-				echo ConsoleText::RED_BOLD;
-			}
-			if ($this->verbose) {
-				echo "\tHash: ", $result['hash'], ConsoleText::NORMAL, "\n";
-			}
-
-			/* Check the seeds and leechs fields */
-			if (empty($result['seeds'])) {
-				$emptyFields['seeds']++;
-			} else if (!(is_int($result['seeds']) || preg_match($regxInt, $result['seeds']))) {
-				$invalidFields['seeds']++;
-				$invalid = true;
-				echo ConsoleText::RED_BOLD;
-			}
-			if ($this->verbose) { 
-				echo "\tSeeds: ", $result['seeds'], ConsoleText::NORMAL, "\n";
-			}
-
-			if (empty($result['leechs'])) {
-				$emptyFields['leechs']++;
-			} else if (!(is_int($result['leechs']) || preg_match($regxInt, $result['leechs']))) {
-				$invalidFields['leechs']++;
-				$invalid = true;
-				echo ConsoleText::RED_BOLD;
-			}
-			if ($this->verbose) {
-				echo "\tLeechs: ", $result['leechs'], ConsoleText::NORMAL, "\n";
-			}
-
-			/* The category field really doesn't have a restriction */
-			if (empty($result['category'])) {
-				$emptyFields['category']++;
-			}
-			if ($this->verbose) { 
-				echo "\tCategory: ", $result['category'], ConsoleText::NORMAL, "\n";
-			}
-
-			/* Total results */
-			if (!$invalid) {
-				$validCount++;
-			}
-			$count++;
+			$results[] = new Result($result);
 		}
-		/* Reset the console text color */
-		echo ConsoleText::NORMAL;
+
 		/* Print the results to the user */
+		$count = ResultMetrics::count($results);
+		$validCount = ResultMetrics::validCount($results);
+		$emptyCount = ResultMetrics::getEmptyFieldTotal($results);
+		$invalidFields = ResultMetrics::getInvalidFieldCount($results);
+		$emptyFields = ResultMetrics::getEmptyFieldCount($results);
+
+		echo "Invalid Fields\n"; var_dump($invalidFields); echo "\n";
+		echo "Empty Fields\n"; var_dump($emptyFields); echo "\n";
+
 		echo "Search module returned $count results ($validCount of $count appear to be valid).\n";
 		if ($validCount < $count) {
-			echo "Invalid Fields (", $this->sumCountArray($invalidFields), " found): ", $this->printCountArray($invalidFields), "\n";
+			echo "Invalid Fields (", ($count - $validCount), " found): ", 
+				ResultMetrics::echoFieldCountArray($invalidFields), "\n";
 		}
-		$emptyFieldCount = $this->sumCountArray($emptyFields);
-		if ($emptyFieldCount > 0) {
-			echo "Empty Fields ($emptyFieldCount found): ", $this->printCountArray($emptyFields), "\n";
+		if ($emptyCount > 0) {
+			echo "Empty Fields ($emptyCount found): ", 
+				ResultMetrics::echoFieldCountArray($emptyFields), "\n";
 		}
 		/* Give the user some help if they have invalid results and didn't ask to look at them */
 		if (!$this->verbose && $validCount != $count) {
