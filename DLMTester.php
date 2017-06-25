@@ -9,6 +9,7 @@ include_once('Cache.php');
 include_once('Result.php');
 include_once('ResultMetrics.php');
 include_once('ConsoleResultViewer.php');
+include_once('HTMLResultViewer.php');
 include_once('ConsoleText.php');
 
 class DLMTester {
@@ -107,29 +108,12 @@ class DLMTester {
 			$results[] = new Result($result);
 		}
 
-		/* Print the results to the user */
-		$count = ResultMetrics::count($results);
-		$validCount = ResultMetrics::validCount($results);
-		$emptyCount = ResultMetrics::getEmptyFieldTotal($results);
-		$invalidFields = ResultMetrics::getInvalidFieldCount($results);
-		$emptyFields = ResultMetrics::getEmptyFieldCount($results);
-
-		echo "Search module returned $count results ($validCount of $count appear to be valid).\n";
-		if ($validCount < $count) {
-			echo "Invalid Fields (", ($count - $validCount), " found): ", 
-				ResultMetrics::echoFieldCountArray($invalidFields), "\n";
-		}
-		if ($emptyCount > 0) {
-			echo "Empty Fields ($emptyCount found): ", 
-				ResultMetrics::echoFieldCountArray($emptyFields), "\n";
-		}
-
 		if ($this->verbose) {
-			ConsoleResultViewer::echoResults($results);
+			HTMLResultViewer::echoResults($results);
 		}
 
 		/* Give the user some help if they have invalid results and didn't ask to look at them */
-		if (!$this->verbose && $validCount != $count) {
+		if (!$this->verbose && ResultMetrics::validCount($results) != ResultMetrics::count($result)) {
 			echo ConsoleText::RED_BOLD, "Invalid results are highlighted by using option -v, --verbose\n", 
 				ConsoleText::NORMAL;
 		}

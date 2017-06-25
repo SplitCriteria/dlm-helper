@@ -5,17 +5,35 @@ include_once('Result.php');
 include_once('ResultViewer.php');
 include_once('ConsoleText.php');
 
-class ConsoleResultViewer {
+class ConsoleResultViewer implements ResultViewer {
 
 	public static function echoResults(array $results) {
 		if (empty($results)) {
 			return false;
 		}
-		$count = 0;
+		
+		/* Print the results to the user */
+		$count = ResultMetrics::count($results);
+		$validCount = ResultMetrics::validCount($results);
+		$emptyCount = ResultMetrics::getEmptyFieldTotal($results);
+		$invalidFields = ResultMetrics::getInvalidFieldCount($results);
+		$emptyFields = ResultMetrics::getEmptyFieldCount($results);
+
+		echo "Search module returned $count results ($validCount of $count appear to be valid).\n";
+		if ($validCount < $count) {
+			echo "Invalid Fields (", ($count - $validCount), " found): ", 
+				ResultMetrics::echoFieldCountArray($invalidFields), "\n";
+		}
+		if ($emptyCount > 0) {
+			echo "Empty Fields ($emptyCount found): ", 
+				ResultMetrics::echoFieldCountArray($emptyFields), "\n";
+		}
+		
+		$resultCount = 0;
 		foreach ($results as $result) {
 			if (get_class($result) == "SplitCriteria\DLMHelper\Result") {
-				$count++;
-				echo "Result #$count\n";
+				$resultCount++;
+				echo "Result #$resultCount\n";
 				echo ($result->isFieldValid(TITLE) ? ConsoleText::NORMAL : ConsoleText::RED_BOLD);
 				echo "\tTitle: ", $result->get(TITLE), "\n";
 				echo ($result->isFieldValid(DOWNLOAD) ? ConsoleText::NORMAL : ConsoleText::RED_BOLD);
