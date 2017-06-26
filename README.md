@@ -37,6 +37,7 @@ Planned updates:
 - [ ] Add web interface if DLMTester.php is loaded on a browser
 - [x] Add `--cache` option to either download and create a cache, or use a cached webpage, during testing
 - [x] Add `--output html` format which allows for easier viewing/testing results
+- [ ] Display all TestOptions and other TestResults into ConsoleResultViewer.php and HTMLResultViewer.php
 
 ## Creating or Fixing a DLM search module
 If your favorite torrent site DLM search module isn't working, or doesn't exist to begin with, then you can create or fix your own without too much trouble.
@@ -62,7 +63,7 @@ Here are the recommended steps to creating your own DLM search module:
     7. Create a regular expression which parses the results and creates the following groups: title*, torrent link*, webpage link, hash, date, seeds, leeches, and category.   *Necessary fields
     8. Edit the `search.php` file, inserting your regular expression into the $regx variable, then assign the groups numbers to the appropriate array element (e.g. if title is the first group, then replace `$row[#]` with `row[0]`)
 
-After the files are saved, test the output using `php DLMTester.php -s "sample search query" INFO
+After the files are saved, test the output using `php DLMTester.php -s "sample search query" INFO`
 
 ### Tips
 * Use `--cache` during testing to avoid repeated network usage
