@@ -10,20 +10,20 @@ include_once('Result.php');
 include_once('ResultMetrics.php');
 include_once('ConsoleResultViewer.php');
 include_once('HTMLResultViewer.php');
-include_once('ConsoleText.php');
+include_once('TestOptions.php');
+include_once('TestResults.php');
 
 class DLMTester {
 
-	private $isError;
-	private $errorMsg;
-	public $results;
-	public $verbose = false;
-	public $useCache;
+	private $results;
 
-	public function btSearch(DLMInfo $info, $query, $maxresults = 0) {
+	public function btSearch(TestOptions $options, DLMInfo $info) {
+		
+		$this->results = new TestResults();
+
 		/* Set up the local variables */
-		$error = &$this->isError;
-		$msg = &$this->errorMsg;
+		$error = &$this->results->isError;
+		$msg = &$this->results->errorMessages;
 		$error = false;
 		$msg = '';
 		/* Check the parameter */
@@ -41,82 +41,77 @@ class DLMTester {
 		$module_file = $info->workingDir . DIRECTORY_SEPARATOR . $info->module;
 		include_once($module_file);
 		$searchClass = new $info->class;
-		if ($this->verbose) {
+		if ($options->isVerbose) {
 			$searchClass->verbose = true;
 		}
-		$searchClass->max_results = $maxresults;
-		if ($this->verbose) {
-			echo "Results are " . ($maxresults > 0 ? "limited to $maxresults." : "NOT limited.") . "\n";
-		}
+		$searchClass->max_results = $options->maxResults;
 
 		/* Test the curl prepare function */
 		$curl = curl_init();
 		$prepareFunc = "prepare";
-		$searchClass->$prepareFunc($curl, $query);
+		$searchClass->$prepareFunc($curl, $options->searchString);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
 		
-		$url = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
-		$isResultFromCache = false;
-		if ($this->useCache) {
+		$this->results->queryURL = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+		$this->results->wasCacheUsed = false;
+		if ($options->useCache) {
 			
 			$cache = new \SplitCriteria\DLMHelper\Cache();
-			if ($cache->isCached($url)) {
-				$result = $cache->getLast();
-				if (!$result) {
-					echo "Unable to read cache file.\n";
+			if ($cache->isCached($this->results->queryURL)) {
+				$this->results->curlResponse = $cache->getLast();
+				if (!$this->results->curlResponse) {
+					$error = true;
+					appendOnNewLine($msg, "Unable to read cache file.");
 					exit(1);
 				}
-				$isResultFromCache = true;
+				$this->results->wasCacheUsed = true;
 			} else {
 				/* Not cached? Make the curl request and cache it */
-				$result = curl_exec($curl);
-				if (!$cache->put($url, $result)) {
-					echo "Unable to cache curl result.\n";
+				$this->results->curlResponse = curl_exec($curl);
+				if (!$cache->put($this->results->queryURL, $this->results->curlResponse)) {
+					$error = true;
+					appendOnNewLine($msg, "Unable to cache curl result.");
 				}
 			}
 		
-		}  else {
+		} else {
 			/* If cache flag isn't set, then just make the curl request */
-			$result = curl_exec($curl);
+			$this->results->curlResponse = curl_exec($curl);
 		}
 
-		if (!$result) {
-			echo "Curl error: ", curl_error($curl), "\n";
+		if (!$this->results->curlResponse) {
+			$error = true;
+			appendOnNewLine($msg, "Curl error: " . curl_error($curl));
 		}
-		if ($this->verbose) {
-			echo "Query URL: $url", 
-				($isResultFromCache ? " (not called -- cache used)" : ""), "\n";
-			if (!$isResultFromCache) {
-				echo "Website response code: ", 
-					curl_getinfo($curl, CURLINFO_RESPONSE_CODE), "\n";
-			}
+		if (!$isResultFromCache) {
+			$this->results->curlResponseCode = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
 		}
+		$this->results->curlResponseLength = strlen($this->results->curlResponse);
+
 		curl_close($curl);
 		
 		/* Test the parse function */
 		$parseFunc = "parse";
 		$plugin = new DLMPlugin();
-		$searchClass->$parseFunc($plugin, $result);
-		$this->results = $plugin->results;
+		$output = $searchClass->$parseFunc($plugin, $this->results->curlResponse);
 
 		/* Copy the raw results into an array of Result objects */
-		$results = array();
-		foreach ($this->results as $result) {
-			$results[] = new Result($result);
-		}
-
-		if ($this->verbose) {
-			HTMLResultViewer::echoResults($results);
+		$this->results->results = array();
+		foreach ($plugin->results as $result) {
+			$this->results->results[] = new Result($result);
 		}
 
 		/* Give the user some help if they have invalid results and didn't ask to look at them */
-		if (!$this->verbose && ResultMetrics::validCount($results) != ResultMetrics::count($result)) {
-			echo ConsoleText::RED_BOLD, "Invalid results are highlighted by using option -v, --verbose\n", 
-				ConsoleText::NORMAL;
+		if (!$options->isVerbose && ResultMetrics::validCount($this->results->results) 
+			!= ResultMetrics::count($this->results->results)) {
+			$this->results->isError = true;
+			appendOnNewLine($msg, "Invalid results are highlighted by using option -v, --verbose");
 		}
+
+		return $this->results;
 	}
 }
 
@@ -124,6 +119,7 @@ class DLMTester {
 $shortoptions = "vcm:o:s:";
 $longopts = array("verbose","cache","max:","output:","search:");
 $options = getopt($shortoptions, $longopts);
+$testOptions = new TestOptions();
 
 /* Validate the command line options */
 if (!$options) {
@@ -142,12 +138,13 @@ if (!$options) {
 		}
 		echo "DLM_INFO_file '$dlmFilename' not found.\n\n";
 	}
+	$testOptions->targetINFOFile = $dlmFilename;
 
 	/* Extract the verbose option */
-	$verbose = (key_exists('v', $options) || key_exists('verbose', $options));
+	$testOptions->isVerbose = (key_exists('v', $options) || key_exists('verbose', $options));
 
 	/* Extract the output format option */
-	$valid_output = array("ARRAY","JSON", "JSON_PRETTY");
+	$valid_output = array("TEXT", "HTML");
 	if (key_exists('o', $options)) {
 		$output = strtoupper($options['o']);
 	} else if (key_exists('output', $options)) {
@@ -161,32 +158,29 @@ if (!$options) {
 	}
 
 	/* Extract the cache option */
-	$useCache = key_exists('c', $options) || key_exists('cache', $options);
+	$testOptions->useCache = key_exists('c', $options) || key_exists('cache', $options);
 
 	/* Extract the max results option */
+	$testOptions->maxResults = -1; /* Default value */
 	if (key_exists('m', $options)) {
-		$maxresults = (int)$options['m'];
+		$testOptions->maxResults = (int)$options['m'];
 	} else if (key_exists('count', $options)) {
-		$maxresults = (int)$options['max'];
-	}
-	if (!isset($maxresults)) {
-		$maxresults = -1;
+		$testOptions->maxResults = (int)$options['max'];
 	}
 	
 	/* Extract the search string options */
 	if (key_exists('s', $options)) {
-		$query = $options['s'];
+		$testOptions->searchString = $options['s'];
 	} else if (key_exists('search', $options)) {
-		$query = $options['search'];
-	} else {
-		$query = NULL;
+		$testOptions->searchString = $options['search'];
 	}
+
 	/* Validate the search string (it must exist and there must only be one) */
-	if (is_null($query)) {
+	if (is_null($testOptions->searchString)) {
 		$fataError = true;
 		echo "No search argument specified.\n\n";
-	} else if (is_array($query)) {
-		$query = $query[0];
+	} else if (is_array($testOptions->searchString)) {
+		$testOptions->searchString = $query[0];
 		echo $argv[0] . " only accepts a single search parameter. '$query' used.\n\n";
 	}
 }
@@ -199,7 +193,7 @@ if (isset($fatalError)) {
 
 	-c, --cache: 	Save results to, or use if it exists, a cache (in ./cache dir)
 	-m, --max:	Max results, if search module contains public variable 'max_results'
-	-o, --output:	Output format (default is PHP 'array'): array, JSON, JSON_pretty
+	-o, --output:	Output format: html (default), text
 	-s, --search: 	[MANDATORY] Search query to pass to the DLM module
 	-v, --verbose:	Output is verbose; includes suspected errors
 
@@ -207,18 +201,7 @@ if (isset($fatalError)) {
 	exit;
 }
 
-if ($verbose) {
-	echo "User-specified query: $query\n";
-	echo "User-specified format: $output\n";
-	if (isset($cache)) {
-		echo "User-specified cache: $cache (", 
-			(file_exists($cache) ? 
-				"exists and will be used" : 
-				"does not exist and will be created"), ")\n";
-	}
-}
-
-$dlmInfo = new DLMInfo($dlmFilename);
+$dlmInfo = new DLMInfo($testOptions->targetINFOFile);
 if (!$dlmInfo->isWellFormed) {
 	echo "DLM INFO file '" . $dlmInfo->filename . "' is NOT well formed.\n" . $dlmInfo->wellFormedErrors . "\n";
 	exit;
@@ -226,21 +209,19 @@ if (!$dlmInfo->isWellFormed) {
 
 /* Run the DLM Search Tester */
 $tester = new DLMTester();
-$tester->verbose = $verbose;
-$tester->useCache = $useCache;
-$tester->btSearch($dlmInfo, $query, $maxresults);
+$results = $tester->btSearch($testOptions, $dlmInfo);
 
 /* Dump the results */
 switch ($output) {
-	case "ARRAY":
-		var_dump($tester->results);
+	case "TEXT":
+		$resultViewer = new ConsoleResultViewer($testOptions, $results);
 		break;
-	case "JSON":
-		echo json_encode($tester->results);
+	case "HTML":
+	default:
+		$resultViewer = new HTMLResultViewer($testOptions, $results);
 		break;
-	case "JSON_PRETTY":
-		echo json_encode($tester->results, JSON_PRETTY_PRINT);
-		break;		
 }
-echo "\n";
+
+$resultViewer->callPrintResults();
+
 ?>

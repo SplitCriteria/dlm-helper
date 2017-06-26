@@ -4,20 +4,22 @@ namespace SplitCriteria\DLMHelper;
 include_once('Result.php');
 include_once('ResultViewer.php');
 include_once('ConsoleText.php');
+include_once('TestOptions.php');
+include_once('TestResults.php');
 
-class ConsoleResultViewer implements ResultViewer {
+class ConsoleResultViewer extends ResultViewer {
 
-	public static function echoResults(array $results) {
-		if (empty($results)) {
+	public function printResults(TestOptions $options, TestResults $results) {
+		if (empty($results->results)) {
 			return false;
 		}
 		
 		/* Print the results to the user */
-		$count = ResultMetrics::count($results);
-		$validCount = ResultMetrics::validCount($results);
-		$emptyCount = ResultMetrics::getEmptyFieldTotal($results);
-		$invalidFields = ResultMetrics::getInvalidFieldCount($results);
-		$emptyFields = ResultMetrics::getEmptyFieldCount($results);
+		$count = ResultMetrics::count($results->results);
+		$validCount = ResultMetrics::validCount($results->results);
+		$emptyCount = ResultMetrics::getEmptyFieldTotal($results->results);
+		$invalidFields = ResultMetrics::getInvalidFieldCount($results->results);
+		$emptyFields = ResultMetrics::getEmptyFieldCount($results->results);
 
 		echo "Search module returned $count results ($validCount of $count appear to be valid).\n";
 		if ($validCount < $count) {
@@ -30,7 +32,7 @@ class ConsoleResultViewer implements ResultViewer {
 		}
 		
 		$resultCount = 0;
-		foreach ($results as $result) {
+		foreach ($results->results as $result) {
 			if (get_class($result) == "SplitCriteria\DLMHelper\Result") {
 				$resultCount++;
 				echo "Result #$resultCount\n";

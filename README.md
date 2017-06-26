@@ -36,7 +36,7 @@ Planned updates:
 - [ ] Allow testing of unpacked DLM packages
 - [ ] Add web interface if DLMTester.php is loaded on a browser
 - [x] Add `--cache` option to either download and create a cache, or use a cached webpage, during testing
-- [ ] Add `--output html` format which allows for easier viewing/testing results
+- [x] Add `--output html` format which allows for easier viewing/testing results
 
 ## Creating or Fixing a DLM search module
 If your favorite torrent site DLM search module isn't working, or doesn't exist to begin with, then you can create or fix your own without too much trouble.

@@ -3,8 +3,10 @@ namespace SplitCriteria\DLMHelper;
 
 include_once('Result.php');
 include_once('ResultViewer.php');
+include_once('TestOptions.php');
+include_once('TestResults.php');
 
-class HTMLResultViewer implements ResultViewer {
+class HTMLResultViewer extends ResultViewer {
 
 	private static function echoResultTitle(Result $result, $count) {	
 		$content = "Result #$count";
@@ -18,7 +20,7 @@ class HTMLResultViewer implements ResultViewer {
 		echo "</span>";
 	}
 
-	public static function echoResults(array $results) {
+	public function printResults(TestOptions $options, TestResults $results) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -118,15 +120,15 @@ class HTMLResultViewer implements ResultViewer {
 	</head>
 	<body>
 		<?php
-		if (empty($results)) {
+		if (empty($results->results)) {
 			return false;
 		}
 
-		$count = ResultMetrics::count($results);
-		$validCount = ResultMetrics::validCount($results);
-		$emptyCount = ResultMetrics::getEmptyFieldTotal($results);
-		$invalidFields = ResultMetrics::getInvalidFieldCount($results);
-		$emptyFields = ResultMetrics::getEmptyFieldCount($results);
+		$count = ResultMetrics::count($results->results);
+		$validCount = ResultMetrics::validCount($results->results);
+		$emptyCount = ResultMetrics::getEmptyFieldTotal($results->results);
+		$invalidFields = ResultMetrics::getInvalidFieldCount($results->results);
+		$emptyFields = ResultMetrics::getEmptyFieldCount($results->results);
 		?>
 
 		<section id="summary_pane" class="bordered" >
@@ -182,7 +184,7 @@ class HTMLResultViewer implements ResultViewer {
 		
 		<section id="results_pane">
 		<?php $resultCount = 0;
-		foreach ($results as $result) {
+		foreach ($results->results as $result) {
 			if (get_class($result) == "SplitCriteria\DLMHelper\Result") {
 				$resultCount++; ?>
 			<section class="bordered result<?php echo ($result->isResultValid() ? " hide" : ""); ?>">
