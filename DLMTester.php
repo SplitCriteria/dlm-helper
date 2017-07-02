@@ -5,6 +5,7 @@ use \Exception;
 include_once('common.php');
 include_once('DLMInfo.php');
 include_once('DLMPlugin.php');
+include_once('DLMModule.php');
 include_once('Cache.php');
 include_once('Result.php');
 include_once('ResultMetrics.php');
@@ -17,23 +18,23 @@ class DLMTester {
 
 	private $results;
 
-	public function btSearch(TestOptions $options, DLMInfo $info) {
+	public function btSearch(TestOptions $options, DLMModule $module) {
 		
 		$this->results = new TestResults();
 
 		/* Set up the local variables */
 		$error = &$this->results->isError;
-		$msg = &$this->results->errorMessages;
+		$msg = &$this->results->errors;
 		$error = false;
 		$msg = '';
 		/* Check the parameter */
 		if (is_null($info)) {
 			$error = true;
-			appendOnNewLine($msg, "No DLMInfo object provided.");
+			$msg[] = "No DLMInfo object provided.";
 			return;
 		} else if (!$info->isWellFormed) {
 			$error = true;
-			appendOnNewLine($msg, "DLM info file is not well formed.");
+			$msg[] = "DLM info file is not well formed.";
 			return;
 		}
 		
@@ -64,7 +65,7 @@ class DLMTester {
 				$this->results->curlResponse = $cache->getLast();
 				if (!$this->results->curlResponse) {
 					$error = true;
-					appendOnNewLine($msg, "Unable to read cache file.");
+					$msg[] = "Unable to read cache file.";
 					exit(1);
 				}
 				$this->results->wasCacheUsed = true;
@@ -73,7 +74,7 @@ class DLMTester {
 				$this->results->curlResponse = curl_exec($curl);
 				if (!$cache->put($this->results->queryURL, $this->results->curlResponse)) {
 					$error = true;
-					appendOnNewLine($msg, "Unable to cache curl result.");
+					$msg[] = "Unable to cache curl result.";
 				}
 			}
 		
@@ -84,7 +85,7 @@ class DLMTester {
 
 		if (!$this->results->curlResponse) {
 			$error = true;
-			appendOnNewLine($msg, "Curl error: " . curl_error($curl));
+			$msg[] = "Curl error: " . curl_error($curl);
 		}
 		if (!$isResultFromCache) {
 			$this->results->curlResponseCode = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
@@ -108,7 +109,7 @@ class DLMTester {
 		if (!$options->isVerbose && ResultMetrics::validCount($this->results->results) 
 			!= ResultMetrics::count($this->results->results)) {
 			$this->results->isError = true;
-			appendOnNewLine($msg, "Invalid results are highlighted by using option -v, --verbose");
+			$msg[] = "Invalid results are highlighted by using option -v, --verbose";
 		}
 
 		return $this->results;
@@ -200,6 +201,8 @@ if (isset($fatalError)) {
 <?php
 	exit;
 }
+
+Check between INFO and module files???
 
 $dlmInfo = new DLMInfo($testOptions->targetINFOFile);
 if (!$dlmInfo->isWellFormed) {

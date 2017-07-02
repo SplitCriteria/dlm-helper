@@ -3,7 +3,7 @@ namespace SplitCriteria\DLMHelper;
 class TestResults {
 	public $results;
 	public $isError;
-	public $errorMessages;
+	public $errors = array();
 	public $wasCacheUsed;
 	public $curlResponseCode;
 	public $curlResponseLength;
