@@ -3,7 +3,6 @@ namespace SplitCriteria\DLMHelper;
 use \Exception;
 
 include_once('common.php');
-include_once('DLMInfo.php');
 include_once('DLMPlugin.php');
 include_once('DLMModule.php');
 include_once('Cache.php');
