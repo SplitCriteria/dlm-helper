@@ -33,7 +33,7 @@ php DLMTester.php -cvs "Search String" DLM_INFO_file
 
 Planned updates:
 - [x] Validate DLM search file results (e.g. check that fields are present and correct format)
-- [ ] Allow testing of unpacked DLM packages
+- [x] Allow testing of unpacked DLM packages
 - [ ] Add web interface if DLMTester.php is loaded on a browser
 - [x] Add `--cache` option to either download and create a cache, or use a cached webpage, during testing
 - [x] Add `--output html` format which allows for easier viewing/testing results
