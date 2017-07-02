@@ -1,6 +1,5 @@
 <?php
 namespace SplitCriteria\DLMHelper;
-use \Exception;
 
 class Cache {
 

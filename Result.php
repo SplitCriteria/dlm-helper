@@ -1,6 +1,5 @@
 <?php
 namespace SplitCriteria\DLMHelper;
-use \Exception;
 
 define("TITLE", "title");
 define("DOWNLOAD", "download");
