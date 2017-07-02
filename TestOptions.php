@@ -4,7 +4,7 @@ class TestOptions {
 	public $useCache;
 	public $isVerbose;
 	public $maxResults;
-	public $targetINFOFile;
+	public $targetFile;
 	public $searchString;
 }
 ?>

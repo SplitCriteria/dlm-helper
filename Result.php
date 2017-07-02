@@ -138,8 +138,8 @@ class Result {
 				   strtotime doesn't understand all date formats. */
 				$result = @strtotime($this->result[DATE]);
 				return (($result && $result != -1)
-					|| \DateTime::createFromFormat("m-d-Y", $this->result[DATE])
-					|| \DateTime::createFromFormat("m/d/Y", $this->result[DATE]));
+					|| @\DateTime::createFromFormat("m-d-Y", $this->result[DATE])
+					|| @\DateTime::createFromFormat("m/d/Y", $this->result[DATE]));
 			case PAGE:
 				return !empty($this->result[PAGE]) &&
 					preg_match(self::REGX_URL, $this->result[PAGE]);

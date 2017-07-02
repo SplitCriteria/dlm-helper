@@ -26,22 +26,10 @@ class DLMTester {
 		$error = &$this->results->isError;
 		$msg = &$this->results->errors;
 		$error = false;
-		$msg = '';
-		/* Check the parameter */
-		if (is_null($info)) {
-			$error = true;
-			$msg[] = "No DLMInfo object provided.";
-			return;
-		} else if (!$info->isWellFormed) {
-			$error = true;
-			$msg[] = "DLM info file is not well formed.";
-			return;
-		}
 		
 		/* Include the module file and instantiate the class */
-		$module_file = $info->workingDir . DIRECTORY_SEPARATOR . $info->module;
-		include_once($module_file);
-		$searchClass = new $info->class;
+		include_once($module->moduleFilename);
+		$searchClass = new $module->info['class'];
 		if ($options->isVerbose) {
 			$searchClass->verbose = true;
 		}
@@ -139,7 +127,7 @@ if (!$options) {
 		}
 		echo "DLM_INFO_file '$dlmFilename' not found.\n\n";
 	}
-	$testOptions->targetINFOFile = $dlmFilename;
+	$testOptions->targetFile = $dlmFilename;
 
 	/* Extract the verbose option */
 	$testOptions->isVerbose = (key_exists('v', $options) || key_exists('verbose', $options));
@@ -188,9 +176,9 @@ if (!$options) {
 
 /* Return usage instructions if there's a fatal command line error */
 if (isset($fatalError)) {
-?>Usage: php DLMTester.php [-cv] [-m max_results] [-o output_format] -s search_text DLM_INFO_file
+?>Usage: php DLMTester.php [-cv] [-m max_results] [-o output_format] -s search_text [DLM_module.dlm or INFO_path]
 
-	If DLM_INFO_file is not specified, then 'INFO' in the current directory will be used.
+	If a module file (.dlm) or INFO file is not specified, then 'INFO' in the current directory will be used.
 
 	-c, --cache: 	Save results to, or use if it exists, a cache (in ./cache dir)
 	-m, --max:	Max results, if search module contains public variable 'max_results'
@@ -202,17 +190,19 @@ if (isset($fatalError)) {
 	exit;
 }
 
-Check between INFO and module files???
+$dlmModule = new DLMModule($testOptions->targetFile);
 
-$dlmInfo = new DLMInfo($testOptions->targetINFOFile);
-if (!$dlmInfo->isWellFormed) {
-	echo "DLM INFO file '" . $dlmInfo->filename . "' is NOT well formed.\n" . $dlmInfo->wellFormedErrors . "\n";
-	exit;
+if (!$dlmModule->isWellFormed) {
+	echo "DLM ", ($dlmModule->isINFOfile ? "INFO " : ""), "file '" . $testOptions->targetFile, "' is NOT well formed. Errors:\n";
+	foreach ($dlmModule->errors as $error) {
+		echo " -$error\n";
+	}
+	exit(1);
 }
 
 /* Run the DLM Search Tester */
 $tester = new DLMTester();
-$results = $tester->btSearch($testOptions, $dlmInfo);
+$results = $tester->btSearch($testOptions, $dlmModule);
 
 /* Dump the results */
 switch ($output) {
