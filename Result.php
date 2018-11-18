@@ -14,7 +14,7 @@ define("CATEGORY", "category");
 class Result {
 
 	const REGX_URL = "/^(https?:\/\/)?([\w\.\-\?\[\]\$\(\)\*\+\/#@!&',:;~=_%]+)+$/";
-	const REGX_MAGNET = "/^magnet:\?xt=urn:(\w+):([a-zA-Z0-9]{40})&dn=([\w\.\-\?\[\]\$\(\)\*\+\/#@!&',:;~=_%]+)$";
+	const REGX_MAGNET = "/^magnet:\?xt=urn:(\w+):([a-zA-Z0-9]{40})&dn=([\w\.\-\?\[\]\$\(\)\*\+\/#@!&',:;~=_%]+)$/";
 	const REGX_HASH = "/^[a-zA-Z0-9]{40}$/";
 	const REGX_INT = "/^[0-9]+$/";
 	
