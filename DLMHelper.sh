@@ -287,7 +287,7 @@ function create() {
 	echo
 	echo "Template DLM files created."
 	echo "When finished editing, test the DLM by:"
-	echo "	php DLMTest.php -s \"Search String\" $name/INFO" 
+	echo "	php DLMTester.php -s \"Search String\" $name/INFO" 
 	echo
 	echo "When finished testing, pack the DLM file by:"
 	echo "	./DLMHelper.sh --pack $name/INFO --name Your_DLM_name.dlm"
