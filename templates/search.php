@@ -59,6 +59,7 @@ class _class_ {
 		if (!($result_count = preg_match_all($regx, $response, $rows, PREG_SET_ORDER))) {
 			if ($this->verbose) {
 				echo "Parsing: no matches found using regx '$regx'\n";
+			}
 			return 0;
 		} else {
 			if ($this->verbose) {
