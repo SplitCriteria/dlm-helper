@@ -65,5 +65,14 @@ Here are the recommended steps to creating your own DLM search module:
 
 After the files are saved, test the output using `php DLMTester.php -s "sample search query" INFO`
 
+### Account Support
+Support for private trackers, which require a username/password login, is now included in the `./DLMHelper.sh` script. After the script creates the INFO and search.php files, do the following:
+1. Open the `INFO` file and check taht `accountsupport` property is set to `true` (a boolean, and not a string)
+2. Open the `search.php` file and implement whatever login scheme in the VerifyAccount function
+3. Pack the DLM (detailed above)
+4. On your Synology, open Download Station > Settings > BT Search
+    1. Click Add and select your DLM
+    2. Click Edit to add your username and password, then Verify to ensure the login works (this calls `VerifyAccount` in `search.php`)
+
 ### Tips
 * Use `--cache` during testing to avoid repeated network usage
