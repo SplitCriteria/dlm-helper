@@ -33,6 +33,22 @@ class _class_ {
 		}
 	}
 
+	/**
+	 * Called when INFO file has 'accountsupport' set to true
+	 * 
+	 * Verifies the user account and returns true if valid.
+	 */
+	public function VerifyAccount($username, $password) {
+		// TODO: Verify users account in whatever method you need
+		
+		// $curl = curl_init();
+		// curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		// curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+		// curl_setopt($curl, CURLOPT_URL, _your_url_here_);
+		// curl_close($curl);
+		return true;
+	}
+
 	public function parse($plugin, $response) {
 
 		<<RSS:return $plugin->addRSSResults($response);

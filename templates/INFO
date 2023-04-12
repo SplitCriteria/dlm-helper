@@ -6,5 +6,6 @@
 "site": "_website_",
 "module": "search.php",
 "type": "search",
-"class": "_class_"
+"class": "_class_",
+"accountsupport": "_account_"
 }

@@ -215,6 +215,26 @@ function create() {
 	done
 	extra=$(echo "$extra" | tr '[:lower:]' '[:upper:]')
 
+	echo "Does the server require an account (i.e. a username/password)?"
+	echo "	[Y]es - The username/password is entered in BT Search under the Edit button"
+	echo "	[N]o  - A username/password is not required."
+
+	# Define yes/no and just the yes response
+	regx_yes_no="^[yn].*"
+	regx_yes="^[y].*"
+	# Compare the lowercase input ${var,,} to the yes/no regex
+	until [[ ${USES_ACCOUNT,,} =~ $regx_yes_no ]]; do
+		read -p "'Y'es 'N'o: " USES_ACCOUNT
+		if [[ $USES_ACCOUNT == "$restart_response" ]]; then 
+			return 2
+		fi
+	done
+	if [[ ${USES_ACCOUNT,,} =~ $regex_yes ]]; then
+		USES_ACCOUNT=true
+	else 
+		USES_ACCOUNT=false
+	fi
+
 	# Make the optional directory if desired
 	if [[ -n $name && ! -e $name ]]; then
 		echo
@@ -228,7 +248,7 @@ function create() {
 	if [[ -z $name ]]; then
 		name='.'
 	fi
-	INFO_swap="s/_name_/$module_name/;s/_displayname_/$display_name/;s/_description_/$description/;s/_version_/$version/;s/_website_/$website/;s/_class_/$class_name/"
+	INFO_swap="s/_name_/$module_name/;s/_displayname_/$display_name/;s/_description_/$description/;s/_version_/$version/;s/_website_/$website/;s/_class_/$class_name/;s/_account_/$USES_ACCOUNT/"
 	PHP_swap="s/_class_/$class_name/;s/_website_/$website/;s/_queryurl_/$queryurl/;s/_maxresults_/$limit/"
 	
 	echo -n "Creating $name/INFO file. " 
