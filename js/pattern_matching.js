@@ -1,4 +1,31 @@
 /**
+ * Pattern matching is done with respect to how each item is 
+ * dependent on one another. A dependency chart is shown below:
+ * 
+ *                    url source ---
+ *                        |        |
+ *                       body      |
+ *                        |        |
+ *                       item ------
+ *                        |
+ *                     -------
+ *                     |     |
+ *                    page   |
+ *                     |     |
+ *      -----------------------------------------------------
+ *      |       |      |    |      |       |        |       |
+ *  download  title  size  date  seeds  leeches  category  hash
+ * 
+ * 
+ * The source is optionally isolated to a "body" which is
+ * separated into multiple items (one for each download result
+ * in the source). The details "page" must be derived from each
+ * item (if at all). The remaining attributes are derived either
+ * from the specific item or from the details page depending on
+ * user-preference.
+ */
+
+/**
  * Matches a pattern against a source then places the 
  * matches and number of matches in the destination. The
  * parameter `options` contains the following properties:
@@ -112,117 +139,12 @@ function showMatches(options) {
     if (!returnValue['success']) {
         if (options['matchSource']) {
             options['destination'].forEach(dst => {
-                console.log('Carrying forward '+ options['source'].id +' to '+dst.id);
                 dst.value = options['source'].value;
             });
         }
     }
 
     return returnValue;
-}
-
-/**
- * Returns an object based on the detected pattern
- * type. Currently, the supports RegEx. Otherwise
- * returns false.
- * 
- * @param {*} pattern 
- */
-function getMatcher(pattern) {
-
-    /* Define patterns of known patterns */
-    const patternRegEx = /\/(.*)\/([dgimsuy]*)/;
-
-    /* Match against known patterns */
-    let matches = pattern.match(patternRegEx);
-    if (matches && matches.length > 1) {
-        /* If it is, then try to compile it */
-        try {
-            /* Return a regex from the pattern and flags */
-            return new RegExp(matches[1], matches[2]);
-        } catch (error) {
-            return false;
-        }
-    } else {
-        /* Unknown pattern */
-        return false;
-    }
-}
-
-/**
- * Computes the matches against the source using the user
- * provided patterns. A dependency chart is shown below:
- * 
- *                    url source ---
- *                        |        |
- *                       body      |
- *                        |        |
- *                       item ------
- *                        |
- *                     -------
- *                     |     |
- *                    page   |
- *                     |     |
- *      -----------------------------------------------------
- *      |       |      |    |      |       |        |       |
- *  download  title  size  date  seeds  leeches  category  hash
- * 
- * 
- * The source is optionally isolated to a "body" which is
- * separated into multiple items (one for each download result
- * in the source). The details "page" must be derived from each
- * item (if at all). The remaining attributes are derived either
- * from the specific item or from the details page depending on
- * user-preference.
- * 
- * @param changed   the element that changed
- */
-function computeMatches(changed) {
-
-    /**
-     * Helper function which matches an arbitrary pattern 
-     * against a source. Returns ?all matches ?one match
-     * 
-     * @param {*} pattern 
-     * @param {*} source 
-     */
-    function match(pattern, source) {
-
-    }
-    /* Keep track whether an "upstream" node is affected
-       (i.e. source, body, item, or page) which will
-       trigger an update of all dependent attributes */
-    let upstreamAffected = false;
-    switch (changed) {
-        case urlSource:
-        case bodyPattern:
-            /* Update the body matches */
-            
-            /* No break -- trickle down updates */
-        case itemPattern:
-        case pagePattern:
-            upstreamAffected = true;
-            break;
-    }
-    if (changed == downloadPattern || upstreamAffected) {
-
-    } else if (changed == titlePattern || upstreamAffected) {
-
-    } else if (changed == sizePattern || upstreamAffected) {
-
-    } else if (changed == datePattern || upstreamAffected) {
-
-    } else if (changed == seedsPattern || upstreamAffected) {
-
-    } else if (changed == leechesPattern || upstreamAffected) {
-
-    } else if (changed == categoryPattern || upstreamAffected) {
-
-    } else if (changed == hashPattern || upstreamAffected) {
-
-    } else {
-        console.log('Unknown element changed: ', changed);
-    }
 }
 
 /**

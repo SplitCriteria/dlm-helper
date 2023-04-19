@@ -1,6 +1,11 @@
 <?php
 class DLMClass {
 
+	// <<< start >>>
+	/* The above comment is used when parsing this file for 
+	   packaging into a DLM. The global options variable and
+	   the constructor are overwritten to hard-code the options */
+
 	private $options;
 
 	/**
@@ -34,6 +39,10 @@ class DLMClass {
 		}
 	}
 
+	/* The comment below is the end token for parsing/packaging
+	   into a DLM */
+	// <<< end >>>
+
 	/**
 	 * Download station calls this function to set the appropriate URL 
 	 * in the cURL object
@@ -50,13 +59,28 @@ class DLMClass {
 	}
 
 	/**
-	 * Returns a size in bytes from a string and modifier
+	 * Returns a size in bytes from a string and optional 
+	 * modifier
 	 * 
-	 * @param size 		unmodified size (e.g. 1)
-	 * @param modifier	modifier (e.g. 'KB', 'MB', 'GB', 'TB')
-	 * @return 			size in bytes (e.g. 1,048,576)
+	 * @param size 	size as a string (e.g. "625.35 MB")
+	 * @return size in bytes (e.g. 1048576) or -1 on error
 	 */
-	private function sizeInBytes($size, $modifier) {
+	private function sizeInBytes($size) {
+		/* Match a number with a single decimal point and 
+		   optional size modifier. Remove any commas first. */
+		$size = str_replace(',', '', $size);
+		if (preg_match("/(\d+(?:\.[\d]+)?)\s*(KB|MB|GB|TB)?/i", $size, $matches)) {
+			/* If a size modifier was found, then save it */
+			$modifier = count($matches) > 2 ? 
+				$modifier = $matches[2] : '';
+		} else {
+			/* No match? Return -1 as an error */
+			return -1;
+		}
+		/* Get the number */
+		$size = $matches[1];
+		/* Convert to bytes using the modifier -- no modifier
+		   assumes bytes */
 		switch (strtoupper($modifier)) {
 		case 'KB':
 			return $size * 1024;
@@ -152,13 +176,16 @@ class DLMClass {
 			"count" => 0,
 			"info" => [],
 			"errors" => [],
-			"matches" => []
+			"items" => [],
+			"parsed" => []
 		];
 
 		$result = &$this->options["result"];
 		$count = &$result["count"];
 		$info = &$result["info"];
 		$errors = &$result["errors"];
+		$parsed = &$result["parsed"];
+		$maxResults = $this->options["maxResults"];
 
 		/* If there is a body pattern, then match the pattern and
 		   provide the results for the item patterns */
@@ -187,17 +214,17 @@ class DLMClass {
 		   provided, then the body which was matched from the response.
 		   Match all the items, returning the results in the order 
 		   they were found and records the count. */
-		$maxResults = $this->options["maxResults"];
 		if ($count = preg_match_all($patterns["item"], 
-				empty($body) ? $response : $body, $result["matches"], PREG_SET_ORDER)) {
+				empty($body) ? $response : $body, $result["items"], PREG_SET_ORDER)) {
 
 			/* Go through all the matches (one per item) and extract 
 			   the additional information (e.g. title, size, date) */
 			$resultNum = 0;
-			foreach ($result["matches"] as $match) {
+			foreach ($result["items"] as $match) {
 				/* The item is either the whole match or the 1st 
 				   matching group */
-				$item = count($match) > 1 ? $match[1] : $match[0];
+				$item = count($match) > 1 ? $match[1] : $match[0];;
+				
 				/* Match the page which may contain follow-on details */
 				if (!empty($patterns["page"])) {
 					preg_match($patterns["page"], $item, $page);
@@ -217,7 +244,7 @@ class DLMClass {
 					preg_match($patterns["title"], 
 						$usePage["title"] ? $details : $item, $title);
 					/* If there was a grouping matches, use that (1st match)
-					   otherwise use the whole match (0th match) */
+					   otherwise use the whole match (0th match) */;
 					$title = count($title) > 1 ? $title[1] : $title[0];
 				}
 
@@ -230,6 +257,8 @@ class DLMClass {
 					preg_match($patterns["size"], 
 						$usePage["size"] ? $details : $item, $size);
 					$size = count($size) > 1 ? $size[1] : $size[0];
+					/* Convert to bytes */
+					$size = $this->sizeInBytes($size);
 				}
 				if (!empty($patterns["date"])) {
 					preg_match($patterns["date"], 
@@ -244,12 +273,12 @@ class DLMClass {
 				if (!empty($patterns["seeds"])) {
 					preg_match($patterns["seeds"], 
 						$usePage["seeds"] ? $details : $item, $seeds);
-					$seeds = count($seeds) > 1 ? $seeds[1] : $seeds[0];
+					$seeds = intval(count($seeds) > 1 ? $seeds[1] : $seeds[0]);
 				}
 				if (!empty($patterns["leeches"])) {
 					preg_match($patterns["leeches"], 
 						$usePage["leeches"] ? $details : $item, $leeches);
-					$leeches = count($leeches) > 1 ? $leeches[1] : $leeches[0];
+					$leeches = intval(count($leeches) > 1 ? $leeches[1] : $leeches[0]);
 				}
 				if (!empty($patterns["category"])) {
 					preg_match($patterns["category"], 
@@ -265,21 +294,30 @@ class DLMClass {
 				$plugin->addResult($title, $download, $size, $date, 
 					$page, $hash, $seeds, $leeches, $category);
 
+				/* Add the results to the info object if in verbose mode */
+				if ($this->options["verbose"]) {
+					$parsed[] = [
+						"title" => $title, "download" => $download,	"size" => $size, "date" => $date, 
+						"page" => $page, "hash" => $hash, "seeds" => $seeds, "leeches" => $leeches,
+						"category" => $category
+					];
+				}
+
 				/* Artificially limit the number of results collected */
 				$resultNum++;
 				if ($maxResults > 0 && $resultNum == $maxResults) {
-					$result["info"][] = "Limited results to ".$resultNum." from ".$result["matches"];
+					$info[] = "Limited results to ".$resultNum." from ".count($result["items"]);
 					/* Set the count to the maximum number, where we stopped */
-					$result["count"] = $resultNum;
+					$count = $resultNum;
 					break;
 				}
 			}
 		} else {
-			$result["errors"][] = "No items matches found.";
+			$errors[] = "No items matches found.";
 		}
 
 		/* Return the number of results found */
-		return $result["count"];
+		return $count;
 	}
 }
 ?>

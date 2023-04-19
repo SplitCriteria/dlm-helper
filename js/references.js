@@ -1,6 +1,8 @@
 /* Get references to the patterns and results (i.e. matches) elements */
 const createDLM = document.getElementById('createDLM');
 const deleteDLM = document.getElementById('deleteDLM');
+const testDLM = document.getElementById('testDLM');
+const testDLMResults = document.getElementById('testDLMResults');
 const publishDLM = document.getElementById('publishDLM');
 const selectDLM = document.getElementById('selectDLM');
 const moduleName = document.getElementById('moduleName');

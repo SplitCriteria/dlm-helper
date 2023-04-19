@@ -1,47 +1,71 @@
 <?php
 ini_set('display_errors', 1);
 include_once('./cache.php');
+include_once('./parse_url.php');
 include_once('./search.php');
+
+/* Parse the url */
+$query = parseURL($_POST['searchURL'], $_POST['searchText']);
+
+/* Create the search.php DLM class options */
 $options = [
     "query" => [
-        "domain" => "https://1337x.to",
-        "queryPrefix" => "/search/",
-        "querySuffix" => "/1/"
+        "domain" => $query["domain"],
+        "queryPrefix" => $query["prefix"],
+        "querySuffix" => $query["suffix"]
     ],
-    "maxResults" => 0,
+    "maxResults" => $_POST["maxResults"],
     "verbose" => true,
     "patterns" => [
-        "body" => "/<tbody>(.*?)<\/tbody>/s",
-        "item" => "/<tr>(.*?)<\/tr>/s",
-        "title" => "/href=\"\/torrent\/[^>]*>([^<]+)/s",
-        "page" => "/href=\"(\/torrent\/[^\"]*)/",
-        "hash" => "/magnet:\?xt=urn:btih:([A-Z0-9]{40})/",
-        "size" => "/size[^\"]*\">([^<]*)/",
-        "leeches" => "/leeches\">(\d+)/",
-        "seeds" => "/seeds\">(\d+)/",
-        "date" => "/date\">([^<]*)/",
-        "download" => "/magnet:[^\"]*/",
-        "category" => "/Category.*<span>(\w+)/"
+        "body" => $_POST["patternBody"],
+        "item" => $_POST["patternItem"],
+        "title" => $_POST["patternTitle"],
+        "page" => $_POST["patternPage"],
+        "hash" => $_POST["patternHash"],
+        "size" => $_POST["patternSize"],
+        "leeches" => $_POST["patternLeeches"],
+        "seeds" => $_POST["patternSeeds"],
+        "date" => $_POST["patternDate"],
+        "download" => $_POST["patternDownload"],
+        "category" => $_POST["patternCategory"]
     ],
     "usePage" => [
-        "hash" => true,
-        "download" => true,
-        "category" => true
+        "title" => $_POST["patternTitleUsePage"] == "true",
+        "hash" => $_POST["patternHashUsePage"] == "true",
+        "size" => $_POST["patternSizeUsePage"] == "true",
+        "leeches" => $_POST["patternLeechesUsePage"] == "true",
+        "seeds" => $_POST["patternSeedsUsePage"] == "true",
+        "date" => $_POST["patternDateUsePage"] == "true",
+        "download" => $_POST["patternDownloadUsePage"] == "true",
+        "category" => $_POST["patternCategoryUsePage"] == "true"
     ],
-    "cache" => [
-        "enable" => true,
-        "directory" => "../cache"
+    "useCache" => [
+        "enable" => $_POST["cache"],
+        "directory" => $_POST["cacheDir"]
     ]
 ];
+
 $dlm = new DLMClass($options);
 
 class DSPlugin {
 
     public function addResult($title, $download, $size, $date, 
             $page, $hash, $seeds, $leeches, $category) {
-        echo "Result added:\n\tTitle: $title\n\tDownload: $download\n\tSize: $size".
-            "\n\tDate: $date\n\tPage: $page\n\tHash: $hash\n\tSeeds: $seeds".
-            "\n\tLeeches: $leeches\n\tCategory: $category\n";
+        echo '<div class="col-12">
+                <div class="card">
+                    <div class="card-header">'.$title.'</div>
+                    <div class="card-body">
+                        <div class="card-text">Download: '.$download.'</div>
+                        <div class="card-text">Size: '.$size.'</div>
+                        <div class="card-text">Date: '.$date.'</div>
+                        <div class="card-text">Page: '.$page.'</div>
+                        <div class="card-text">Hash: '.$hash.'</div>
+                        <div class="card-text">Seeds: '.$seeds.'</div>
+                        <div class="card-text">Leeches: '.$leeches.'</div>
+                        <div class="card-text">Category: '.$category.'</div>
+                    </div>
+                </div>
+            </div>';
     }
 }
 
@@ -73,11 +97,9 @@ if (!($result = $cache->get($url))) {
 /* Close the curl object */
 curl_close($curl);
 
-/* If we got a good response, then parse the result */
+/* If we got a good response, then parse the result 
+   which will dump the result in HTML */
 if ($result) {
     $dlm->parse(new DSPlugin(), $result);
 }
-
-// echo json_encode($options, JSON_PRETTY_PRINT);
-
 ?>
