@@ -1,55 +1,51 @@
-/* Get references to the patterns and results (i.e. matches) elements */
+/* Navigation bar buttons */
 const createDLM = document.getElementById('createDLM');
 const deleteDLM = document.getElementById('deleteDLM');
 const testDLM = document.getElementById('testDLM');
-const testDLMResults = document.getElementById('testDLMResults');
 const publishDLM = document.getElementById('publishDLM');
 const selectDLM = document.getElementById('selectDLM');
+/* Test result elements */
+const testDLMResults = document.getElementById('testDLMResults');
+const testResultsLoadingSpinner = document.getElementById('testResultsLoadingSpinner');
+/* Metadata form inputs */
 const moduleName = document.getElementById('moduleName');
 const moduleDisplayName = document.getElementById('moduleDisplayName');
 const moduleDescription = document.getElementById('moduleDescription');
 const moduleVersion = document.getElementById('moduleVersion');
 const moduleAccountSupport = document.getElementById('moduleAccountSupport');
+/* The example search URL and search text form inputs */
 const searchURL = document.getElementById('searchURL');
 const searchText = document.getElementById('searchText');
-const urlSource = document.getElementById('urlSource');
-const detailsPageSource = document.getElementById('detailsPageSource');
+/* These elements contain the pattern source and resulting matches */
 const sourceContent = document.getElementById('sourceContent');
 const patternMatches = document.getElementById('patternMatches');
-const bodyPattern = document.getElementById('patternBody');
+/* These elements contain the url source and matches (not immediately
+   visible to the user */
+const urlSource = document.getElementById('urlSource');
+const detailsPageSource = document.getElementById('detailsPageSource');
 const bodyMatches = document.getElementById('matchesBody');
-/* TODO: Remove count objects which have been removed from index.html */
-const bodyMatchesCount = document.getElementById('matchesBodyCount');
-const itemPattern = document.getElementById('patternItem');
 const itemMatches = document.getElementById('matchesItem');
-const itemMatchesCount = document.getElementById('matchesItemCount');
+const pageMatches = document.getElementById('matchesPage');
+/* Patterns and their "use page" checkboxes */
+const bodyPattern = document.getElementById('patternBody');
+const itemPattern = document.getElementById('patternItem');
+const pagePattern = document.getElementById('patternPage');
 const titlePattern = document.getElementById('patternTitle');
 const titlePatternUsePage = document.getElementById('patternTitleUsePage');
-const titleMatchesCount = document.getElementById('matchesTitleCount');
 const downloadPattern = document.getElementById('patternDownload');
 const downloadPatternUsePage = document.getElementById('patternDownloadUsePage');
-const downloadMatchesCount = document.getElementById('matchesDownloadCount');
 const datePattern = document.getElementById('patternDate');
 const datePatternUsePage = document.getElementById('patternDateUsePage');
-const dateMatchesCount = document.getElementById('matchesDateCount');
 const sizePattern = document.getElementById('patternSize');
 const sizePatternUsePage = document.getElementById('patternSizeUsePage');
-const sizeMatchesCount = document.getElementById('matchesSizeCount');
 const seedsPattern = document.getElementById('patternSeeds');
 const seedsPatternUsePage = document.getElementById('patternSeedsUsePage');
-const seedsMatchesCount = document.getElementById('matchesSeedsCount');
 const leechesPattern = document.getElementById('patternLeeches');
 const leechesPatternUsePage = document.getElementById('patternLeechesUsePage');
-const leechesMatchesCount = document.getElementById('matchesLeechesCount');
 const categoryPattern = document.getElementById('patternCategory');
 const categoryPatternUsePage = document.getElementById('patternCategoryUsePage');
-const categoryMatchesCount = document.getElementById('matchesCategoryCount');
 const hashPattern = document.getElementById('patternHash');
 const hashPatternUsePage = document.getElementById('patternHashUsePage');
-const hashMatchesCount = document.getElementById('matchesHashCount');
-const pagePattern = document.getElementById('patternPage');
-const pageMatches = document.getElementById('matchesPage');
-const pageMatchesCount = document.getElementById('matchesPageCount');
 /* The accordion collapsable areas */
 const collapseBody = document.getElementById('collapseBody');
 const collapseItem = document.getElementById('collapseItem');

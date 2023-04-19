@@ -14,12 +14,16 @@ function setupTestDLM() {
             signal: signal
         });
         const text = await response.text();
+        /* Hide the loading spinner */
+        testResultsLoadingSpinner.classList.add('d-none');
         /* Load the results into the test modal */
         testDLMResults.innerHTML = text;
     }
 
     /* Run the test when the test button is clicked */
     testDLM.addEventListener('click', () => {
+        /* Show the loading spinner */
+        testResultsLoadingSpinner.classList.remove('d-none');
         /* Create an abort controller to stop the 
            request if necessary */
         const abortController = new AbortController();
