@@ -1,78 +1,34 @@
-# Download Manager Helper and Tester
-This project helps developers analyze, create, and test Download Manager (dlm) files used by Synology's Download Manager. There are two main files users will access in this project:
-```
-./DLMHelper.sh
-```
-and
-```
-php DLMTester.php
-```
+# Download Manager Helper
+This project helps developers create and test Synology Download Manager (dlm) files. Clone this repository onto any PHP enabled webserver (e.g. Synology WebStation) and go to `./index.html`. Follow these steps to create and test your own DLM:
 
-Sample DLMs are available in the `sampleDLMs/` folder.
+1. Go to `./index.html` in your favorite web browser
+2. Create a new DLM or edit a previously made DLM
+    - Note: Data is stored in your browsers storage; if you clear the browser data you will lose your data
+3. Fill out the Metadata for your DLM
+4. Go to a torrent website and conduct a sample search
+5. Copy/paste the URL of the search results (e.g. `https://some.torrent.website.com/search/?q=Search+Title`) into DLM Helper's Search URL input
+6. Copy/paste the search string from the URL to the Search Text (e.g. `Search+Title`) input
+    - Note: The source code of the website should load in the `Source Content` section
+    - Note: Many torrent websites require Javascript or other plugins to function properly. DLM Helper currently does **NOT** support the creation of DLMs from those websites
+7. Use regular expressions in the Patterns section to isolate the search result items
+    - Note: You may include a grouping in the regular expression, if more than 1 group is present only the first group is used
+    - Note: The Body Pattern is optional and is used to narrow the source content (e.g. `/<body>(.*)<\/body>/s`)
+    - Note: The Item Pattern is is **required** and is used to target each result (e.g. `/<tr>(.*?)<\/tr>/s`)
+8. Confirm the desired content is present in the Pattern Matches section
+9. Click the Test button to show sample results
+10. Click the Publish button to create/download your DLM
 
-## DLMHelper.sh
-DLMHelper.sh is a Bash script which allows the user to:
+**Note:** DLM files are created using the Synology standard which is located on the [Synology website](https://global.download.synology.com/download/Document/DeveloperGuide/DLM_Guide.pdf).
 
-- Unpack an existing DLM file: `./DLMHelper.sh --unpack filename.dlm`
-- Create skeleton DLM files (with template code) for development: `./DLMHelper.sh --create`
-- Pack DLM files into a DLM package: `./DLMHelper.sh --pack INFO --name my.dlm`
+## Account Support
+Support for private trackers, which require a username/password login, is now included. However, you will have to implement the the verification code yourself. Here are the steps to include account support
 
-**Note:** Template DLM files are created using the Synology standard which is located on the [Synology website](https://global.download.synology.com/download/Document/DeveloperGuide/DLM_Guide.pdf).
-
-Planned updates:
-- [ ] Create --test command which calls DLMTester.php to test directly from DLMHelper.sh
-
-## DLMTester.php
-DLMTester.php is a command line PHP program which allows users to test unpacked, or newly created, DLM files (see DLMHelper.sh, above). Once the files have been tested successfully, the user can pack the DLM files using DLMHelper.sh which will be ready for use on Synology's Download Manager.
-
-To test DLM files, enter a search parameter on the command line. The parsed results will be output to stdout. The user will need to examine the results for accuracy.
-
-```
-php DLMTester.php -cvs "Search String" DLM_INFO_file
-```
-
-Planned updates:
-- [x] Validate DLM search file results (e.g. check that fields are present and correct format)
-- [x] Allow testing of unpacked DLM packages
-- [ ] Add web interface if DLMTester.php is loaded on a browser
-- [x] Add `--cache` option to either download and create a cache, or use a cached webpage, during testing
-- [x] Add `--output html` format which allows for easier viewing/testing results
-- [ ] Display all TestOptions and other TestResults into ConsoleResultViewer.php and HTMLResultViewer.php
-
-## Creating or Fixing a DLM search module
-If your favorite torrent site DLM search module isn't working, or doesn't exist to begin with, then you can create or fix your own without too much trouble.
-
-### Creating a DLM search module
-Here are the recommended steps to creating your own DLM search module:
-1. Go to the torrent website and determine how you can obtain search results: RSS feed, JSON object (usually through an API), or Website search
-2. Make note of the domain and the search address (e.g. domain: "https://targetdomain.com", search address: "/search.php&q=")
-3. Create template DLM files uing `./DLMHelper.sh --create`
-4. In the interactive menus, use the domain and search address found above
-  * RSS feed
-
-    5. In the interactive menus, select RSS parsing
-
-  * JSON object
-
-    5. In the interactive menus, select JSON parsing
-
-  * Website search
-
-    5. In the interactive menus, select manual result parsing
-    6. Copy the torrent website source code into a regular expression test bed (e.g. [RegExr](http://regexr.com))
-    7. Create a regular expression which parses the results and creates the following groups: title*, torrent link*, webpage link, hash, date, seeds, leeches, and category.   *Necessary fields
-    8. Edit the `search.php` file, inserting your regular expression into the $regx variable, then assign the groups numbers to the appropriate array element (e.g. if title is the first group, then replace `$row[#]` with `row[0]`)
-
-After the files are saved, test the output using `php DLMTester.php -s "sample search query" INFO`
-
-### Account Support
-Support for private trackers, which require a username/password login, is now included in the `./DLMHelper.sh` script. After the script creates the INFO and search.php files, do the following:
-1. Open the `INFO` file and check taht `accountsupport` property is set to `true` (a boolean, and not a string)
-2. Open the `search.php` file and implement whatever login scheme in the VerifyAccount function
-3. Pack the DLM (detailed above)
-4. On your Synology, open Download Station > Settings > BT Search
+1. Select the "Account Support" checkbox prior to clicking Publish
+2. Publish the DLM
+3. Unpack the DLM `tar xzf your_dlm_file.dlm`
+4. Edit `search.php`
+5. Implement the appropriate account verification code in the `VerifyAccount` function
+6. Repack your DLM `tar czf your_dlm_file.dlm INFO search.php`
+7. On your Synology, open Download Station > Settings > BT Search
     1. Click Add and select your DLM
     2. Click Edit to add your username and password, then Verify to ensure the login works (this calls `VerifyAccount` in `search.php`)
-
-### Tips
-* Use `--cache` during testing to avoid repeated network usage
