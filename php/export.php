@@ -1,7 +1,5 @@
 <?php
 
-ini_set('display_errors', 1);
-
 include_once('./parse_url.php');
 
 /* Define the directory in which the temp dlm files are stored */
