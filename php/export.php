@@ -96,7 +96,7 @@ $dlmUniqueName =
 /* Tell the browser we're serving a tar.gz file */
 header('Content-Type: application/x-gtar');
 /* Tell the browser there's an attachment and give the name */
-header('Content-Disposition: attachment; filename="'.$dlmUniqueName.'.tar.gz');//.dlm"');
+header('Content-Disposition: attachment; filename="'.$dlmUniqueName.'.dlm"');
 /* Tell the browser this DLM has already expired */
 header('Expires: 0');
 
