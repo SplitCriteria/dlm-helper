@@ -162,7 +162,7 @@ function setupPatternMatching() {
         showMatches({ 
             'pattern': bodyPattern, 'source': sourceContent, 
             'destination': [patternMatches, bodyMatches], 
-            'number': bodyMatchesCount, 'matchSource': true
+            'matchSource': true
         });
         /* After the body is updated, update the item matches but 
            do so "in the background". That is, use the undisplayed 
@@ -190,7 +190,7 @@ function setupPatternMatching() {
         showMatches({ 
             'pattern': itemPattern, 'source': sourceContent, 
             'destination': [patternMatches, itemMatches], 
-            'number': itemMatchesCount, 'matchSource': true
+            'matchSource': true
         });
         /* After the item is updated, then update the page matches but,
            like above, do so to a control not displayed to the user */
@@ -207,7 +207,7 @@ function setupPatternMatching() {
         sourceContent.value = itemMatches.value;
         showMatches({ 
             'pattern': pagePattern, 'source': sourceContent, 
-            'destination': [patternMatches, pageMatches], 'number': pageMatchesCount
+            'destination': [patternMatches, pageMatches]
         });
         /* Manually call a change to the pageMatches so the a details 
            page load is attempted */
@@ -220,7 +220,7 @@ function setupPatternMatching() {
             detailsPageSource.value : itemMatches.value;
         showMatches({ 
             'pattern': titlePattern, 'source': sourceContent, 
-            'destination': patternMatches, 'number': titleMatchesCount
+            'destination': patternMatches
         });
     }
     const updateDownloadMatches = () => {
@@ -228,7 +228,7 @@ function setupPatternMatching() {
             detailsPageSource.value : itemMatches.value;
         showMatches({ 
             'pattern': downloadPattern, 'source': sourceContent, 
-            'destination': patternMatches, 'number': downloadMatchesCount
+            'destination': patternMatches
         });
     }
     const updateDateMatches = () => {
@@ -236,7 +236,7 @@ function setupPatternMatching() {
             detailsPageSource.value : itemMatches.value;
         showMatches({ 
             'pattern': datePattern, 'source': sourceContent, 
-            'destination': patternMatches, 'number': dateMatchesCount
+            'destination': patternMatches
         });
     }
     const updateSizeMatches = () => {
@@ -244,7 +244,7 @@ function setupPatternMatching() {
             detailsPageSource.value : itemMatches.value;
         showMatches({ 
             'pattern': sizePattern, 'source': sourceContent, 
-            'destination': patternMatches, 'number': sizeMatchesCount
+            'destination': patternMatches
         });
     }
     const updateSeedsMatches = () => {
@@ -252,7 +252,7 @@ function setupPatternMatching() {
             detailsPageSource.value : itemMatches.value;
         showMatches({ 
             'pattern': seedsPattern, 'source': sourceContent, 
-            'destination': patternMatches, 'number': seedsMatchesCount
+            'destination': patternMatches
         });
     }
     const updateLeechesMatches = () => {
@@ -260,7 +260,7 @@ function setupPatternMatching() {
             detailsPageSource.value : itemMatches.value;
         showMatches({ 
             'pattern': leechesPattern, 'source': sourceContent, 
-            'destination': patternMatches, 'number': leechesMatchesCount
+            'destination': patternMatches
         });
     }
     const updateCategoryMatches = () => {
@@ -268,7 +268,7 @@ function setupPatternMatching() {
             detailsPageSource.value : itemMatches.value;
         showMatches({ 
             'pattern': categoryPattern, 'source': sourceContent, 
-            'destination': patternMatches, 'number': categoryMatchesCount
+            'destination': patternMatches
         });
     }
     const updateHashMatches = () => {
@@ -276,7 +276,7 @@ function setupPatternMatching() {
             detailsPageSource.value : itemMatches.value;
         showMatches({ 
             'pattern': hashPattern, 'source': sourceContent, 
-            'destination': patternMatches, 'number': hashMatchesCount
+            'destination': patternMatches
         });
     }
     /* Update all the matches which depend on either the source

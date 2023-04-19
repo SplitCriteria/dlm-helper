@@ -24,6 +24,8 @@ function setupTestDLM() {
     testDLM.addEventListener('click', () => {
         /* Show the loading spinner */
         testResultsLoadingSpinner.classList.remove('d-none');
+        /* Clear out old test results */
+        testDLMResults.innerHTML = '';
         /* Create an abort controller to stop the 
            request if necessary */
         const abortController = new AbortController();
