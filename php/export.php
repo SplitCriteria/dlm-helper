@@ -23,15 +23,17 @@ $info['name'] = $_POST['moduleName'];
 $info['displayname'] = $_POST['moduleDisplayName'];
 $info['description'] = $_POST['moduleDescription'];
 $info['version'] = $_POST['moduleVersion'];
-$info['site'] = $domain;
+$info['site'] = $query["domain"];
 $info['module'] = 'search.php';
 $info['type'] = 'search';
-$info['class'] = 'DLMClass';
+$info['class'] = $className;
 $info['accountsupport'] = isset($_POST['moduleAccountSupport']) ? true : false;
 
 /* Hard code the options and blank constructor */
 /* Use str_replace to escape any " marks in the patterns */
 $newConstructor = '
+class '.$_POST['moduleName']. '{
+
     private $options = [
         "query" => [
             "domain" => "'.$query["domain"].'",

@@ -1,10 +1,18 @@
 <?php
-class DLMClass {
 
-	// <<< start >>>
-	/* The above comment is used when parsing this file for 
-	   packaging into a DLM. The global options variable and
-	   the constructor are overwritten to hard-code the options */
+/**
+ * This class is performs the search functions (i.e. prepare, 
+ * VerifyAccount, and parse) required by the Download Station.
+ * Here, it is used as testing (i.e. the options are passed
+ * in during object construction) and for publishing where the
+ * the options are hard-coded. The "start" tag below (only 
+ * present on unpublished DLMs is used when publishing the
+ * file and along with the "end" tag define an area to be cut
+ * and replaced with the hard-coded options.
+ */
+
+// <<< start >>>
+class DLMClass {
 
 	private $options;
 

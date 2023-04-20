@@ -4,6 +4,8 @@ include_once('./cache.php');
 include_once('./parse_url.php');
 include_once('./search.php');
 
+header('Content-Type: text/html');
+
 /* Parse the url */
 $query = parseURL($_POST['searchURL'], $_POST['searchText']);
 
@@ -68,8 +70,6 @@ class DSPlugin {
             </div>';
     }
 }
-
-header('Content-Type: text/plain');
 
 $curl = curl_init();
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

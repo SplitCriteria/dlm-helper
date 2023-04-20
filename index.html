@@ -47,22 +47,24 @@
                         <div class="row g-4">
                             <div class="col-6 col-sm-6 col-md-2">
                                 <label for="moduleName" class="form-label">Module Name</label>
-                                <input id="moduleName" name="moduleName" class="form-control" placeholder="MyDLM">
+                                <!-- The module name is also used as a unique class name in the search.php file. The pattern
+                                     defined here is a limited version of the PHP standard class name pattern: https://www.php.net/manual/en/language.oop5.basic.php -->
+                                <input id="moduleName" name="moduleName" class="form-control" placeholder="MyDLM" pattern="^[a-zA-Z_][a-zA-Z0-9_]*$" required>
                                 <div class="form-text">Unique among all Download Station modules</div>
                             </div>
                             <div class="col-6 col-sm-6 col-md-2">
                                 <label for="moduleDisplayName" class="form-label">Display Name</label>
-                                <input id="moduleDisplayName" name="moduleDisplayName" class="form-control" placeholder="My DLM">
+                                <input id="moduleDisplayName" name="moduleDisplayName" class="form-control" placeholder="My DLM" required>
                                 <div class="form-text">Name displayed to user</div>
                             </div>
                             <div class="col-12 col-sm-6 col-md-4">
                                 <label for="moduleDescription" class="form-label">Description</label>
-                                <input id="moduleDescription" name="moduleDescription" class="form-control" placeholder="My DLM for website">
+                                <input id="moduleDescription" name="moduleDescription" class="form-control" placeholder="My DLM for website" required>
                                 <div class="form-text">Description displayed to user</div>
                             </div>
                             <div class="col-6 col-sm-3 col-md-2">
                                 <label for="moduleVersion" class="form-label">Version</label>
-                                <input id="moduleVersion" name="moduleVersion" class="form-control" placeholder="1.0">
+                                <input id="moduleVersion" name="moduleVersion" class="form-control" placeholder="1.0" required>
                             </div>
                             <div class="col-6 col-sm-3 col-md-2">
                                 <label for="moduleAccountSupport" class="form-check-label">Account Support</label>
@@ -81,12 +83,12 @@
                         <div class="row g-4">
                             <div class="col-12 col-md-6">
                                 <label for="searchURL" class="form-label">Search URL</label>
-                                <input id="searchURL" name="searchURL" class="form-control" placeholder="https://1337x.to/search/The+Simpsons/1/">
+                                <input id="searchURL" name="searchURL" class="form-control" placeholder="https://1337x.to/search/The+Simpsons/1/" required>
                                 <div class="form-text">Paste a sample search URL</div>
                             </div>
                             <div class="col-12 col-md-6">
                                 <label for="searchText" class="form-label">URL Search Text</label>
-                                <input id="searchText" name="searchText" class="form-control" placeholder="The+Simpsons">
+                                <input id="searchText" name="searchText" class="form-control" placeholder="The+Simpsons" required>
                                 <div class="form-text">The search text within the URL</div>
                             </div>
                         </div>
@@ -125,7 +127,7 @@
                                                     </h2>
                                                     <div id="collapseItem" class="accordion-collapse collapse" data-bs-parent="#patternAccordion">
                                                         <div class="accordion-body">
-                                                            <input id="patternItem" type="text" name="patternItem" class="form-control" placeholder="" >
+                                                            <input id="patternItem" type="text" name="patternItem" class="form-control" placeholder="" required>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -149,7 +151,7 @@
                                                     </h2>
                                                     <div id="collapseTitle" class="accordion-collapse collapse" data-bs-parent="#patternAccordion">
                                                         <div class="accordion-body">
-                                                            <input id="patternTitle" type="text" name="patternTitle" class="form-control" placeholder="" >
+                                                            <input id="patternTitle" type="text" name="patternTitle" class="form-control" placeholder="" required>
                                                             <label for="patternTitleUsePage" class="form-check-label">Use Page</label>
                                                             <input id="patternTitleUsePage" type="checkbox" name="patternTitleUsePage" class="form-check-input">
                                                         </div>
@@ -163,7 +165,7 @@
                                                     </h2>
                                                     <div id="collapseDownload" class="accordion-collapse collapse" data-bs-parent="#patternAccordion">
                                                         <div class="accordion-body">
-                                                            <input id="patternDownload" type="text" name="patternDownload" class="form-control" placeholder="magnet://" >
+                                                            <input id="patternDownload" type="text" name="patternDownload" class="form-control" placeholder="magnet://" required>
                                                             <label for="patternDownloadUsePage" class="form-check-label">Use Page</label>
                                                             <input id="patternDownloadUsePage" type="checkbox" name="patternDownloadUsePage" class="form-check-input">
                                                         </div>
