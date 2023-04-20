@@ -1,6 +1,17 @@
 <?php
-namespace SplitCriteria\DLMHelper;
 
+/**
+ * A class which manages a simple key/value cache in a 
+ * specified directory. The cache is kept in uncompressed
+ * files.
+ * 
+ * isCached(key) - returns true if the key is in the cache
+ * put(key, value) - stores a key/value pair
+ * get(key) - returns a value, or false if key doesn't exist
+ * getLast() - returns the last referenced key (e.g. isCached(key)), or false
+ * drop(key) - removes a key/value pair
+ * dropAll() - clears the cache
+ */
 class Cache {
 
 	const DEBUG = false;
@@ -13,19 +24,27 @@ class Cache {
 	private $keys;
 	private $target;
 
+	/**
+	 * Initialize a cache object targeting a specified directory.
+	 * 
+	 * @param cacheDir	a reference to directory to use for this
+	 * 					instance of caching
+	 */
 	function __construct($cacheDir = self::DEFAULT_CACHE_DIR) {
+
+		/* If an empty string was passed, then set to the default directory */
+		if (empty($cacheDir)) {
+			$cacheDir = self::DEFAULT_CACHE_DIR;
+		}
+
+		/* Determine if the cache directory exists */
+		if (!file_exists($cacheDir) || !is_dir($cacheDir)) {
+			/* If it doesn't exist, or isn't a directory, create it */
+			mkdir($cacheDir, 0740, true);
+		}
 
 		/* Get the full path if a relative path is passed (e.g. "../cachedir") */
 		$this->dir = realpath($cacheDir);
-		/* Make sure the parameter is a directory */
-		if (file_exists($this->dir) && !is_dir($this->dir)) {
-			/* Otherwise use the default directory */
-			$this->dir = realpath(self::DEFAULT_CACHE_DIR);
-		}
-		/* If the directory doesn't exist, then create it */
-		if (!file_exists($this->dir)) {
-			mkdir($this->dir, 0740, true);
-		}
 	
 		$this->keyfilename = $this->dir . DIRECTORY_SEPARATOR . self::KEY_FILENAME;
 
