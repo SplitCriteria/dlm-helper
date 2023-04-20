@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This class is performs the search functions (i.e. prepare, 
+ * This class performs the search functions (i.e. prepare, 
  * VerifyAccount, and parse) required by the Download Station.
  * Here, it is used as testing (i.e. the options are passed
  * in during object construction) and for publishing where the
@@ -10,7 +10,6 @@
  * file and along with the "end" tag define an area to be cut
  * and replaced with the hard-coded options.
  */
-
 // <<< start >>>
 class DLMClass {
 
