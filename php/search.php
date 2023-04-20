@@ -237,6 +237,8 @@ class DLMClass {
 					preg_match($patterns["page"], $item, $page);
 					/* If there was a grouping matched, use that */
 					$page = count($page) > 1 ? $page[1] : $page[0];
+				} else {
+					$page = '';
 				}
 
 				/* Fetch the details page which could be used below */
@@ -253,12 +255,20 @@ class DLMClass {
 					/* If there was a grouping matches, use that (1st match)
 					   otherwise use the whole match (0th match) */;
 					$title = count($title) > 1 ? $title[1] : $title[0];
+				} else {
+					/* Return an error -- there should be a title found */
+					$plugin->addResult('ERROR: No title found', '', 1, 0, '', '', 0, 0, '');
+					return $resultNum;
 				}
 
 				if (!empty($patterns["download"])) {
 					preg_match($patterns["download"], 
 						$usePage["download"] ? $details : $item, $download);
 					$download = count($download) > 1 ? $download[1] : $download[0];
+				} else {
+					/* Return an error -- there should be a download found */
+					$plugin->addResult('ERROR: No download found', '', 1, 0, '', '', 0, 0, '');
+					return $resultNum;
 				}
 				if (!empty($patterns["size"])) {
 					preg_match($patterns["size"], 
@@ -266,36 +276,47 @@ class DLMClass {
 					$size = count($size) > 1 ? $size[1] : $size[0];
 					/* Convert to bytes */
 					$size = $this->sizeInBytes($size);
+				} else {
+					$size = -1;
 				}
 				if (!empty($patterns["date"])) {
 					preg_match($patterns["date"], 
 						$usePage["date"] ? $details : $item, $date);
 					$date = count($date) > 1 ? $date[1] : $date[0];
+				} else {
+					$date = 0;
 				}
 				if (!empty($patterns["hash"])) {
 					preg_match($patterns["hash"], 
 						$usePage["hash"] ? $details : $item, $hash);
 					$hash = count($hash) > 1 ? $hash[1] : $hash[0];
+				} else {
+					$hash = '';
 				}
 				if (!empty($patterns["seeds"])) {
 					preg_match($patterns["seeds"], 
 						$usePage["seeds"] ? $details : $item, $seeds);
 					$seeds = intval(count($seeds) > 1 ? $seeds[1] : $seeds[0]);
+				} else {
+					$seeds = -1;
 				}
 				if (!empty($patterns["leeches"])) {
 					preg_match($patterns["leeches"], 
 						$usePage["leeches"] ? $details : $item, $leeches);
 					$leeches = intval(count($leeches) > 1 ? $leeches[1] : $leeches[0]);
+				} else {
+					$leeches = -1;
 				}
 				if (!empty($patterns["category"])) {
 					preg_match($patterns["category"], 
 						$usePage["category"] ? $details : $item, $category);
 					$category = count($category) > 1 ? $category[1] : $category[0];
+				} else {
+					$category = '';
 				}
 
-				/* TODO: Check the results */
-
-				/* TODO: Convert the date to the expected format (e.g. "2017-05-03 12:05:02")
+				/* Convert the date to the expected format (e.g. "2017-05-03T12:05:02") */
+				$date = date('c', strtotime($date));
 
 				/* Add the results to the plugin */
 				$plugin->addResult($title, $download, $size, $date, 
