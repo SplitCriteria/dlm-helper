@@ -15,21 +15,21 @@
                 <span class="navbar-toggler-icon" fill="currentColor"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav container-fluid mb-2 mb-lg-0 d-flex">
-                    <li class="nav-item me-2">
+                <ul class="navbar-nav container-fluid mb-2 mb-sm-0 d-flex">
+                    <li class="nav-item mt-2 mb-2 mt-sm-0 me-sm-2">
                         <select class="form-select" id="selectDLM">
                         </select>
                     </li>
-                    <li class="nav-item me-2">
+                    <li class="nav-item mb-2 me-sm-2">
                         <button id="createDLM" class="btn btn-success" type="button">Create New</button>
                     </li>
-                    <li class="nav-item me-2">
+                    <li class="nav-item mb-2 me-sm-2">
                         <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">Delete</button>
                     </li>
-                    <li class="nav-item ms-auto me-2">
+                    <li class="nav-item mb-2 ms-sm-auto me-sm-2">
                         <button id="testDLM" class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#testDLMModal">Test</button>
                     </li>
-                    <li class="nav-item me-2">
+                    <li class="nav-item me-sm-2">
                         <button id="publishDLM" class="btn btn-secondary" type="submit">Publish</button>
                     </li>
                 </ul>
@@ -41,34 +41,39 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        Metadata
+                        Search Module Configuration
                     </div>
                     <div class="card-body">
                         <div class="row g-4">
-                            <div class="col-6 col-sm-6 col-md-2">
+                            <div class="col-6 col-sm-3 col-md-2">
                                 <label for="moduleName" class="form-label">Module Name</label>
                                 <!-- The module name is also used as a unique class name in the search.php file. The pattern
                                      defined here is a limited version of the PHP standard class name pattern: https://www.php.net/manual/en/language.oop5.basic.php -->
                                 <input id="moduleName" name="moduleName" class="form-control" placeholder="MyDLM" pattern="^[a-zA-Z_][a-zA-Z0-9_]*$" required>
                                 <div class="form-text">Unique among all Download Station modules</div>
                             </div>
-                            <div class="col-6 col-sm-6 col-md-2">
+                            <div class="col-6 col-sm-3 col-md-2">
                                 <label for="moduleDisplayName" class="form-label">Display Name</label>
                                 <input id="moduleDisplayName" name="moduleDisplayName" class="form-control" placeholder="My DLM" required>
                                 <div class="form-text">Name displayed to user</div>
                             </div>
-                            <div class="col-12 col-sm-6 col-md-4">
+                            <div class="col-12 col-sm-6 col-md-3">
                                 <label for="moduleDescription" class="form-label">Description</label>
                                 <input id="moduleDescription" name="moduleDescription" class="form-control" placeholder="My DLM for website" required>
                                 <div class="form-text">Description displayed to user</div>
                             </div>
-                            <div class="col-6 col-sm-3 col-md-2">
+                            <div class="col-6 col-sm-4 col-md-1">
                                 <label for="moduleVersion" class="form-label">Version</label>
                                 <input id="moduleVersion" name="moduleVersion" class="form-control" placeholder="1.0" required>
                             </div>
-                            <div class="col-6 col-sm-3 col-md-2">
+                            <div class="col-6 col-sm-4 col-md-2">
                                 <label for="moduleAccountSupport" class="form-check-label">Account Support</label>
                                 <input id="moduleAccountSupport" name="moduleAccountSupport" type="checkbox" class="form-check-input">
+                            </div>
+                            <div class="col-6 col-sm-4 col-md-2">
+                                <label for="moduleMaxResults" class="form-label">Limit Results</label>
+                                <input id="moduleMaxResults" name="maxResults" class="form-control" pattern="\d+">
+                                <div class="form-text">Hard limit search results (use 0 to show all)</div>
                             </div>
                         </div>
                     </div>

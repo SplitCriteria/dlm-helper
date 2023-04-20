@@ -13,6 +13,7 @@ const moduleDisplayName = document.getElementById('moduleDisplayName');
 const moduleDescription = document.getElementById('moduleDescription');
 const moduleVersion = document.getElementById('moduleVersion');
 const moduleAccountSupport = document.getElementById('moduleAccountSupport');
+const moduleMaxResults = document.getElementById('moduleMaxResults');
 /* The example search URL and search text form inputs */
 const searchURL = document.getElementById('searchURL');
 const searchText = document.getElementById('searchText');

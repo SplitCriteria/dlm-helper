@@ -4,6 +4,8 @@
  */
 function setupTestDLM() {
 
+    const maxResults = 5;
+
     async function runTest(data, signal) {
         /* Fetch data from our own fetcher which has its own
            cache */
@@ -17,7 +19,9 @@ function setupTestDLM() {
         /* Hide the loading spinner */
         testResultsLoadingSpinner.classList.add('d-none');
         /* Load the results into the test modal */
-        testDLMResults.innerHTML = text;
+        testDLMResults.innerHTML = 
+            '<p>Max results artifically limited to '+maxResults+'</p>'
+            + text;
     }
 
     /* Run the test when the test button is clicked */
@@ -60,8 +64,8 @@ function setupTestDLM() {
         data.append("patternCategoryUsePage", categoryPatternUsePage.checked);
         /* Disable the cache */
         data.append("cache", true);
-        /* Don't limit results */
-        data.append("maxResults", 10);
+        /* For the test, always limit results */
+        data.append("maxResults", maxResults);
         /* Run the test by POST'ing to the php test script */
         runTest(data, signal);
     });

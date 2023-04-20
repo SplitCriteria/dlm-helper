@@ -40,7 +40,7 @@ class '.$_POST['moduleName']. ' {
             "queryPrefix" => "'.$query["prefix"].'",
             "querySuffix" => "'.$query["suffix"].'",
         ],
-        "maxResults" => 0,
+        "maxResults" => '.$_POST["maxResults"].',
         "verbose" => false,
         "patterns" => [
             "body" => "'.str_replace('"', '\"', $_POST["patternBody"]).'",

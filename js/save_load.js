@@ -8,6 +8,7 @@ function createEmptyDLMDatum() {
         'url': '',
         'searchText': '',
         'accountSupport': false,
+        'maxResults': 0,
         'bodyPattern': '',
         'itemPattern': '',
         'pagePattern': '/\/torrent[^"]*/',
@@ -71,6 +72,7 @@ function loadDLMDatum(datum) {
     moduleDescription.value = datum['description'];
     moduleVersion.value = datum['version'];
     moduleAccountSupport.checked = datum['accountSupport'];
+    moduleMaxResults.value = datum['maxResults'];
     searchURL.value = datum['url'];
     searchText.value = datum['searchText'];
     bodyPattern.value = datum['bodyPattern'];
@@ -142,6 +144,7 @@ function setupSaveLoad() {
         datum['url'] = searchURL.value;
         datum['searchText'] = searchText.value;
         datum['accountSupport'] = moduleAccountSupport.checked;
+        datum['maxResults'] = moduleMaxResults.value;
         datum['bodyPattern'] = bodyPattern.value;
         datum['itemPattern'] = itemPattern.value;
         datum['pagePattern'] = pagePattern.value;
@@ -180,6 +183,7 @@ function setupSaveLoad() {
     moduleVersion.addEventListener('input', saveData);
     moduleVersion.addEventListener('input', updateModuleSelect);
     moduleAccountSupport.addEventListener('input', saveData);
+    moduleMaxResults.addEventListener('input', saveData);
     searchURL.addEventListener('input', saveData);
     searchText.addEventListener('input', saveData);
     bodyPattern.addEventListener('input', saveData);
