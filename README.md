@@ -4,7 +4,7 @@ This project helps developers create and test Synology Download Manager (dlm) fi
 1. Go to `./index.html` in your favorite web browser
 2. Create a new DLM or edit a previously made DLM
     - Note: Data is stored in your browsers storage; if you clear the browser data you will lose your data
-3. Fill out the Metadata for your DLM
+3. Fill out the Configuration for your DLM
 4. Go to a torrent website and conduct a sample search
 5. Copy/paste the URL of the search results (e.g. `https://some.torrent.website.com/search/?q=Search+Title`) into DLM Helper's Search URL input
 6. Copy/paste the search string from the URL to the Search Text (e.g. `Search+Title`) input
@@ -13,7 +13,7 @@ This project helps developers create and test Synology Download Manager (dlm) fi
 7. Use regular expressions in the Patterns section to isolate the search result items
     - Note: You may include a grouping in the regular expression, if more than 1 group is present only the first group is used
     - Note: The Body Pattern is optional and is used to narrow the source content (e.g. `/<body>(.*)<\/body>/s`)
-    - Note: The Item Pattern is is **required** and is used to target each result (e.g. `/<tr>(.*?)<\/tr>/s`)
+    - Note: The Item Pattern is **required** and is used to target each result (e.g. `/<tr>(.*?)<\/tr>/s`)
 8. Confirm the desired content is present in the Pattern Matches section
 9. Click the Test button to show sample results
 10. Click the Publish button to create/download your DLM
