@@ -11,14 +11,14 @@ function createEmptyDLMDatum() {
         'maxResults': 0,
         'bodyPattern': '',
         'itemPattern': '',
-        'pagePattern': '/\/torrent[^"]*/',
+        'pagePattern': '/\\/torrent[^"]*/',
         'titlePattern': '',
         'titlePatternUsePage': false,
-        'downloadPattern': '/magnet:\?xt=urn:btih:[^"]*/',
+        'downloadPattern': '/magnet:\\?xt=urn:btih:[^"]*/',
         'downloadPatternUsePage': false,
         'datePattern': '',
         'datePatternUsePage': false,
-        'sizePattern': '/>\s*(\d+(?:\.\d+)?\s*(?:KB|MB|GB|TB))/i',
+        'sizePattern': '/\\s*(\\d+(?:\\.\\d+)?\\s*(?:KB|MB|GB|TB))/i',
         'sizePatternUsePage': false,
         'seedsPattern': '',
         'seedsPatternUsePage': false,
@@ -26,7 +26,7 @@ function createEmptyDLMDatum() {
         'leechesPatternUsePage': false,
         'categoryPattern': '',
         'categoryPatternUsePage': false,
-        'hashPattern': '/magnet:\?xt=urn:btih:(\w{40})/',
+        'hashPattern': '/magnet:\\?xt=urn:btih:(\\w{40})/',
         'hashPatternUsePage': false
     };
 }
