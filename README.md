@@ -1,5 +1,10 @@
-# Download Manager Helper
-This project helps developers create and test Synology Download Manager (dlm) files. Clone this repository onto any PHP enabled webserver (e.g. Synology WebStation) and go to `./index.html`. Follow these steps to create and test your own DLM:
+# About
+DLM Helper is a web-based tool to quickly and easily create, test, and publish DLM search modules to expand the capability of Synology Download Manager.
+
+<img src="./docs/dlm_configuration.png">
+
+# Instructions
+Clone this repository onto any PHP enabled webserver (e.g. Synology WebStation) and go to `./index.html`. Follow these steps to create and test your own DLM:
 
 1. Go to `./index.html` in your favorite web browser
 2. Create a new DLM or edit a previously made DLM
@@ -18,7 +23,9 @@ This project helps developers create and test Synology Download Manager (dlm) fi
 9. Click the Test button to show sample results
 10. Click the Publish button to create/download your DLM
 
-**Note:** DLM files are created using the Synology standard which is located on the [Synology website](https://global.download.synology.com/download/Document/DeveloperGuide/DLM_Guide.pdf).
+## Notes
+- DLM files are created using the Synology standard which is located on the [Synology website](https://global.download.synology.com/download/Document/DeveloperGuide/DLM_Guide.pdf)
+- Account support (i.e. private trackers) is undocumented (as of Apr 2023), but details can be found on the [Synology forum](https://community.synology.com/enu/forum/1/post/159687)
 
 ## Account Support
 Support for private trackers, which require a username/password login, is now included. However, you will have to implement the the verification code yourself. Here are the steps to include account support
