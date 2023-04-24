@@ -20,6 +20,9 @@ curl_setopt($curl, CURLOPT_SSL_VERIFYSTATUS, true);
 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
 curl_setopt($curl, CURLOPT_VERBOSE, true);
 
+/* Set a user agent to mimic a real browser */
+curl_setopt($curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36");
+
 /* Set the URL */
 curl_setopt($curl, CURLOPT_URL, $_POST['url']);
 
