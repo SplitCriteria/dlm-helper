@@ -3,10 +3,29 @@ DLM Helper is a web-based tool to quickly and easily create, test, and publish D
 
 <img src="./docs/dlm_configuration.png">
 
-# Instructions
-Clone this repository onto any PHP enabled webserver (e.g. Synology WebStation) and go to `./index.html`. Follow these steps to create and test your own DLM:
+# Installation
+There are two options to use DLM Helper:
+- Use a PHP-enabled webserver (e.g. Synology WebServer) and Git from the command line:
+    1. Clone the files into your server's root directory
+        ```
+        git clone https://github.com/SplitCriteria/dlm-helper.git
+        ```
+    2. Point your web browser to `http://your.webserver/`
+- Use Docker from the command line:
+    1. Download and run the container
+        ```
+        docker run -dp 3000:80 splitcriteria/dlm-helper
+        ```
+    2. Go to `http://127.0.0.1:3000`
+- Use Docker Desktop (or Docker Synology package)
+    1. Download the image `splitcriteria/dlm-helper` from the registry
+    2. Launch the container (change the local port as desired, e.g. 3000)
+    3. Go to: `http://127.0.0.1:3000`
 
-1. Go to `./index.html` in your favorite web browser
+# Instructions
+Follow these steps to create and test your own DLM:
+
+1. Go to `./index.html`
 2. Create a new DLM or edit a previously made DLM
     - Note: Data is stored in your browsers storage; if you clear the browser data you will lose your data
 3. Fill out the Configuration for your DLM
