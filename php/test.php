@@ -1,5 +1,4 @@
 <?php
-ini_set('display_errors', 1);
 include_once('./cache.php');
 include_once('./parse_url.php');
 include_once('./search.php');
@@ -77,7 +76,7 @@ curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
 curl_setopt($curl, CURLOPT_SSL_VERIFYSTATUS, true);
 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
 curl_setopt($curl, CURLOPT_VERBOSE, true);
-$dlm->prepare($curl, "The Simpsons");
+$dlm->prepare($curl, $_POST['searchText']);
 
 /* Get the full URL after the DLM module has prepared it */
 $url = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
@@ -90,7 +89,7 @@ if (!($result = $cache->get($url))) {
         /* If there's a good result, cache it */
         $cache->put($url, $result);
     } else {
-        echo "Unable to get response from $url\n";
+        echo "<p>Unable to get response from $url</p>";
     }
 }
 
