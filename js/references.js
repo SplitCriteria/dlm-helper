@@ -4,6 +4,10 @@ const deleteDLM = document.getElementById('deleteDLM');
 const testDLM = document.getElementById('testDLM');
 const publishDLM = document.getElementById('publishDLM');
 const selectDLM = document.getElementById('selectDLM');
+/* Settings elements */
+const settingsIcon = document.getElementById('settingsIcon');
+const useCache = document.getElementById('useCache');
+const clearCache = document.getElementById('clearCache');
 /* Test result elements */
 const testDLMResults = document.getElementById('testDLMResults');
 const testResultsLoadingSpinner = document.getElementById('testResultsLoadingSpinner');

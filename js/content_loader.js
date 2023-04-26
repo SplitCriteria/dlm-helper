@@ -1,3 +1,7 @@
+/**
+ * Sets up the capabilities to request and load content from
+ * external sources including the cache.
+ */
 function setupContentLoader() {
 
     /**
@@ -47,7 +51,7 @@ function setupContentLoader() {
         /* Create the data to pass to the content fetcher */
         const data = new FormData();
         data.append("url", searchURL.value);
-        data.append("cache", true);
+        data.append("cache", useCache.checked);
 
         /* Start the content loading process */
         loadContent(data, signal, [urlSource, sourceContent]);
@@ -73,7 +77,7 @@ function setupContentLoader() {
             pageDetailsURL = url;
             const data = new FormData();
             data.append("url", url);
-            data.append("cache", true);
+            data.append("cache", useCache.checked);
             loadContent(data, signal, detailsPageSource);
         }
     });

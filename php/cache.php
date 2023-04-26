@@ -204,4 +204,13 @@ class Cache {
 
 }
 
+/* Handle user commands */
+if (isset($_POST['command'])) {
+	switch ($_POST['command']) {
+		case 'clear' :
+			$cache = new Cache($_POST['dir']);
+			return !$cache->dropAll();
+	}
+}
+
 ?>
