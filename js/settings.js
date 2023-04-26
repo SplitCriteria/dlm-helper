@@ -17,15 +17,19 @@ function setupSettings() {
     });
 
     /* Clear the cache */
-    clearCache.addEventListener('click', () => {
+    clearCache.addEventListener('click', async () => {
+        /* Set the info modal to say that we're clearing the cache */
+        infoModalBody.innerHTML = '<p>Clearing the cache...</p>';
         const data = new FormData();
         data.append("command", "clear");
         data.append("dir", "../cache");
-        const response = fetch('./php/cache.php', 
+        const response = await fetch('./php/cache.php', 
         {
             method: "POST",
             body: data
         });
+        /* Show the info notice */
+        infoModalBody.innerHTML = '<p>Cache cleared!</p>';
     });
 
     /* Open the settings menu when the settings icon clicked */

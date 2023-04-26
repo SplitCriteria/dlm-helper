@@ -22,7 +22,7 @@
                     <input id="useCache" type="checkbox" class="form-check-input">
                 </div>
                 <div class="col-6">
-                    <button id="clearCache" class="btn btn-warning" type="button">Clear Cache</button>
+                    <button id="clearCache" class="btn btn-warning" type="button" data-bs-toggle="modal" data-bs-target="#infoModal">Clear Cache</button>
                 </div>
             </div>
         </div>
@@ -295,9 +295,12 @@
                                                         <div class="card-header">
                                                             Source Content
                                                         </div>
-                                                        <div class="card-body p-0">
+                                                        <div class="card-body p-0 position-relative">
                                                             <textarea class="container-fluid" id="sourceContent" rows="25" readonly>
                                                             </textarea>
+                                                            <div class="spinner-border invisible position-absolute top-50 start-50" id="sourceLoading" role="status">
+                                                                <span class="visually-hidden">Loading...</span>
+                                                              </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -350,6 +353,21 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="infoModal" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Info</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div id="infoModalBody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Ok</button>
                 </div>
             </div>
         </div>

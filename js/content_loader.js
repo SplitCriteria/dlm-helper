@@ -4,6 +4,13 @@
  */
 function setupContentLoader() {
 
+    /* Add a listener to the source content text area so when 
+       text is input into it, a "loading" spinner is cleared */
+    sourceContent.addEventListener('input', () => {
+        sourceContent.removeAttribute('disabled');
+        sourceLoading.classList.add('invisible');
+    });
+
     /**
      * Load content using a custom php fetch script with 
      * its own internal caching system
@@ -54,6 +61,9 @@ function setupContentLoader() {
         data.append("cache", useCache.checked);
 
         /* Start the content loading process */
+        sourceContent.value = '';
+        sourceContent.setAttribute('disabled', true);
+        sourceLoading.classList.remove('invisible');
         loadContent(data, signal, [urlSource, sourceContent]);
     });
     
@@ -78,6 +88,7 @@ function setupContentLoader() {
             const data = new FormData();
             data.append("url", url);
             data.append("cache", useCache.checked);
+            /* Load the content */
             loadContent(data, signal, detailsPageSource);
         }
     });

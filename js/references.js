@@ -4,6 +4,9 @@ const deleteDLM = document.getElementById('deleteDLM');
 const testDLM = document.getElementById('testDLM');
 const publishDLM = document.getElementById('publishDLM');
 const selectDLM = document.getElementById('selectDLM');
+/* Info modal */
+const infoModal = document.getElementById('infoModal');
+const infoModalBody = document.getElementById('infoModalBody');
 /* Settings elements */
 const settingsIcon = document.getElementById('settingsIcon');
 const useCache = document.getElementById('useCache');
@@ -22,6 +25,7 @@ const moduleMaxResults = document.getElementById('moduleMaxResults');
 const searchURL = document.getElementById('searchURL');
 const searchText = document.getElementById('searchText');
 /* These elements contain the pattern source and resulting matches */
+const sourceLoading = document.getElementById('sourceLoading');
 const sourceContent = document.getElementById('sourceContent');
 const patternMatches = document.getElementById('patternMatches');
 /* These elements contain the url source and matches (not immediately
