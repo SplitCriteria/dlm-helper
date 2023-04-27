@@ -83,17 +83,17 @@ if (!empty($_POST['cache'])) {
 $url = $_POST['url'];
 
 /* If there's no cache, or not in the cache, fetch the page from its source */
-if (empty($cache) || empty($result = $cache->get($url))) {
+if (empty($cache) || empty($result['data'] = $cache->get($url))) {
     /* Try to get the data from a webdriver resource first then 
        through curl second */
-    $result = webDriverFetch($url);
+    $result['data'] = webDriverFetch($url);
     if (empty($result)) {
-        $result = curlFetch($url);
+        $result['data'] = curlFetch($url);
         if (!empty($result)) {
-            // echo "From source (cURL)\n";
+            $result['source'] = 'curl';
         }
     } else {
-        // echo "From source (webdriver)\n";
+        $result['source'] = 'webdriver';
     }
     
     /* If one of the responses was not empty then cache the result */
@@ -101,9 +101,10 @@ if (empty($cache) || empty($result = $cache->get($url))) {
         $cache->put($url, $result);
     }
 } else {
-    // echo "From cache\n";
+    $result['source'] = 'cache';
 }
 
 /* Dump result or an error */
-echo !empty($result) ? $result : "<p>No webdriver or curl results</p>";
+header('Content-type: application/json');
+echo json_encode($result);
 ?>

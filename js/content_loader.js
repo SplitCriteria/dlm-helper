@@ -4,13 +4,6 @@
  */
 function setupContentLoader() {
 
-    /* Add a listener to the source content text area so when 
-       text is input into it, a "loading" spinner is cleared */
-    sourceContent.addEventListener('input', () => {
-        sourceContent.removeAttribute('disabled');
-        sourceLoading.classList.add('invisible');
-    });
-
     /**
      * Load content using a custom php fetch script with 
      * its own internal caching system
@@ -21,6 +14,7 @@ function setupContentLoader() {
      *                          the loaded content to go -- 
      *                          'input' events will be sent to
      *                          destinations after updating
+     * @return the content loaded
      */
     async function loadContent(data, signal, destinations) {
         /* Make sure destinations is an array */
@@ -35,18 +29,24 @@ function setupContentLoader() {
             body: data,
             signal: signal
         });
-        const text = await response.text();
+        /* fetch.php returns a JSON object with content
+           in the 'data' property */
+        const content = await response.json();
+
         /* Save the content in the destinations and trigger 
            their input listeners */
         destinations.forEach(dst => { 
-            dst.value = text;
+            dst.value = content['data'];
             dst.dispatchEvent(new Event('input'));
         });
+
+        /* Return the content */
+        return content;
     }
 
     /* When the search URL changes, then fetch the 
        source, if able */
-    searchURL.addEventListener('change', () => {
+    searchURL.addEventListener('change', async () => {
 
         /* Create an abort controller to stop the 
            request if necessary */
@@ -60,11 +60,33 @@ function setupContentLoader() {
         data.append("url", searchURL.value);
         data.append("cache", useCache.checked);
 
-        /* Start the content loading process */
+        /* Remove the old content and show the loading spinners */
         sourceContent.value = '';
         sourceContent.setAttribute('disabled', true);
         sourceLoading.classList.remove('invisible');
-        loadContent(data, signal, [urlSource, sourceContent]);
+        sourceMethodBadge.classList.add('invisible');
+
+        /* Start, and await the response of, the content loading process */
+        const content = await loadContent(data, signal, [urlSource, sourceContent]);
+
+        /* Remove the loading spinners and set the info badges */
+        sourceContent.removeAttribute('disabled');
+        sourceLoading.classList.add('invisible');
+        switch (content['source']) {
+            case 'cache':
+                sourceMethodBadge.innerText = 'From Cache';
+                break;
+            case 'webdriver':
+                sourceMethodBadge.innerText = 'From WebDriver';
+                break;
+            case 'curl':
+                sourceMethodBadge.innerText = 'From cURL';
+                break;
+            default:
+                sourceMethodBadge.innerText = 'From Unknown';
+        }
+        sourceMethodBadge.classList.remove('invisible');
+
     });
     
     /* When the page pattern changes, attempt to fetch a details

@@ -28,6 +28,8 @@ const searchText = document.getElementById('searchText');
 const sourceLoading = document.getElementById('sourceLoading');
 const sourceContent = document.getElementById('sourceContent');
 const patternMatches = document.getElementById('patternMatches');
+const sourceContextBadge = document.getElementById('sourceContextBadge');
+const sourceMethodBadge = document.getElementById('sourceMethodBadge');
 /* These elements contain the url source and matches (not immediately
    visible to the user */
 const urlSource = document.getElementById('urlSource');

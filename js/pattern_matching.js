@@ -155,10 +155,12 @@ function setupPatternMatching() {
 
     /* Add change listeners to the patterns so the matches are updated in real time */
     const updateBodyMatches = () => {
-        /* Save the body matches in the bodyMatches element (not displayed)
-           and show the matches to the user as well */
         /* Set the source content to the urlSource */
         sourceContent.value = urlSource.value;
+        /* Show the badge telling the user of the content source */
+        sourceContextBadge.innerText = "URL Source";
+        /* Save the body matches in the bodyMatches element (not displayed)
+           and show the matches to the user as well */
         showMatches({ 
             'pattern': bodyPattern, 'source': sourceContent, 
             'destination': [patternMatches, bodyMatches], 
@@ -183,10 +185,15 @@ function setupPatternMatching() {
         pageMatches.dispatchEvent(new Event('change'));
     }
     const updateItemMatches = () => {
-        /* Save the item matches in the itemMatches element (not displayed)
-           and show the matches to the user as well */
         /* Set the source content to the body matches */
         sourceContent.value = bodyMatches.value;
+        /* Show the badge telling the user of the content source> If there's 
+           a body pattern, then assume there was a body match and say we're 
+           using the results of the body pattern matched against the url source.
+           Otherwise, the URL is carried forward and we're using the URL source. */
+        sourceContextBadge.innerText = bodyPattern.value ? "Body Matches" : "URL Source";
+        /* Save the item matches in the itemMatches element (not displayed)
+           and show the matches to the user as well */
         showMatches({ 
             'pattern': itemPattern, 'source': sourceContent, 
             'destination': [patternMatches, itemMatches], 
@@ -205,6 +212,8 @@ function setupPatternMatching() {
     const updatePageMatches = () => {
         /* Set the soruce content to the item matches */
         sourceContent.value = itemMatches.value;
+        /* Show the badge telling the user we're using the Item Matches */
+        sourceContextBadge.innerText = "Item Matches";
         showMatches({ 
             'pattern': pagePattern, 'source': sourceContent, 
             'destination': [patternMatches, pageMatches]
@@ -215,65 +224,121 @@ function setupPatternMatching() {
     }
     const updateTitleMatches = () => {
         /* Set the source content to the either the item matches
-           or the details page */
-        sourceContent.value = titlePatternUsePage.checked ? 
-            detailsPageSource.value : itemMatches.value;
+           or the details page and update the info badge. */
+        if (titlePatternUsePage.checked) {
+            sourceContent.value = detailsPageSource.value;
+            sourceContextBadge.innerText = "Details Page";
+        } else {
+            sourceContent.value = itemMatches.value;
+            sourceContextBadge.innerText = "Item Matches";
+        }
+        /* Show the badge telling the user we're using the Item Matches */
+        sourceContextBadge.innerText = "Item Matches";
         showMatches({ 
             'pattern': titlePattern, 'source': sourceContent, 
             'destination': patternMatches
         });
     }
     const updateDownloadMatches = () => {
-        sourceContent.value = downloadPatternUsePage.checked ? 
-            detailsPageSource.value : itemMatches.value;
+        /* Set the source content to the either the item matches
+           or the details page and update the info badge. */
+        if (downloadPatternUsePage.checked) {
+            sourceContent.value = detailsPageSource.value;
+            sourceContextBadge.innerText = "Details Page";
+        } else {
+            sourceContent.value = itemMatches.value;
+            sourceContextBadge.innerText = "Item Matches";
+        }
         showMatches({ 
             'pattern': downloadPattern, 'source': sourceContent, 
             'destination': patternMatches
         });
     }
     const updateDateMatches = () => {
-        sourceContent.value = datePatternUsePage.checked ? 
-            detailsPageSource.value : itemMatches.value;
+        /* Set the source content to the either the item matches
+           or the details page and update the info badge. */
+        if (datePatternUsePage.checked) {
+            sourceContent.value = detailsPageSource.value;
+            sourceContextBadge.innerText = "Details Page";
+        } else {
+            sourceContent.value = itemMatches.value;
+            sourceContextBadge.innerText = "Item Matches";
+        }
         showMatches({ 
             'pattern': datePattern, 'source': sourceContent, 
             'destination': patternMatches
         });
     }
     const updateSizeMatches = () => {
-        sourceContent.value = sizePatternUsePage.checked ? 
-            detailsPageSource.value : itemMatches.value;
+        /* Set the source content to the either the item matches
+           or the details page and update the info badge. */
+        if (sizePatternUsePage.checked) {
+            sourceContent.value = detailsPageSource.value;
+            sourceContextBadge.innerText = "Details Page";
+        } else {
+            sourceContent.value = itemMatches.value;
+            sourceContextBadge.innerText = "Item Matches";
+        }
         showMatches({ 
             'pattern': sizePattern, 'source': sourceContent, 
             'destination': patternMatches
         });
     }
     const updateSeedsMatches = () => {
-        sourceContent.value = seedsPatternUsePage.checked ? 
-            detailsPageSource.value : itemMatches.value;
+        /* Set the source content to the either the item matches
+           or the details page and update the info badge. */
+        if (seedsPatternUsePage.checked) {
+            sourceContent.value = detailsPageSource.value;
+            sourceContextBadge.innerText = "Details Page";
+        } else {
+            sourceContent.value = itemMatches.value;
+            sourceContextBadge.innerText = "Item Matches";
+        }
         showMatches({ 
             'pattern': seedsPattern, 'source': sourceContent, 
             'destination': patternMatches
         });
     }
     const updateLeechesMatches = () => {
-        sourceContent.value = leechesPatternUsePage.checked ? 
-            detailsPageSource.value : itemMatches.value;
+        /* Set the source content to the either the item matches
+           or the details page and update the info badge. */
+        if (leechesPatternUsePage.checked) {
+            sourceContent.value = detailsPageSource.value;
+            sourceContextBadge.innerText = "Details Page";
+        } else {
+            sourceContent.value = itemMatches.value;
+            sourceContextBadge.innerText = "Item Matches";
+        }
         showMatches({ 
             'pattern': leechesPattern, 'source': sourceContent, 
             'destination': patternMatches
         });
     }
     const updateCategoryMatches = () => {
-        sourceContent.value = categoryPatternUsePage.checked ? 
-            detailsPageSource.value : itemMatches.value;
+        /* Set the source content to the either the item matches
+           or the details page and update the info badge. */
+        if (categoryPatternUsePage.checked) {
+            sourceContent.value = detailsPageSource.value;
+            sourceContextBadge.innerText = "Details Page";
+        } else {
+            sourceContent.value = itemMatches.value;
+            sourceContextBadge.innerText = "Item Matches";
+        }
         showMatches({ 
             'pattern': categoryPattern, 'source': sourceContent, 
             'destination': patternMatches
         });
     }
     const updateHashMatches = () => {
-        sourceContent.value = hashPatternUsePage.checked ? 
-            detailsPageSource.value : itemMatches.value;
+        /* Set the source content to the either the item matches
+           or the details page and update the info badge. */
+        if (hashPatternUsePage.checked) {
+            sourceContent.value = detailsPageSource.value;
+            sourceContextBadge.innerText = "Details Page";
+        } else {
+            sourceContent.value = itemMatches.value;
+            sourceContextBadge.innerText = "Item Matches";
+        }
         showMatches({ 
             'pattern': hashPattern, 'source': sourceContent, 
             'destination': patternMatches
