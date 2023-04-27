@@ -27,8 +27,8 @@ function webDriverFetch($url) {
                 WebDriverBy::cssSelector('body'))
         );
         $result = $driver->findElement(WebDriverBy::cssSelector('body'));
-        /* ->getAttribute('innerHTML') does not work in PHP implementation
-           instead use ->getDOMProperty */
+        /* ->getAttribute('innerHTML') does not work in PHP WebDriver 
+           implementation; instead use ->getDOMProperty */
         $result = $result->getDOMProperty('innerHTML');
     } catch(Exception $e) {
         /* Something didn't work -- just return false */
