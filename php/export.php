@@ -67,6 +67,10 @@ class '.$_POST['moduleName']. ' {
         ],
         "useCache" => [
             "enable" => false
+        ],
+        "proxy" => [
+            "enable" => '.($_POST["proxyEnable"] == "on" ? 'true' : 'false').',
+            "url" => "'.$_POST["proxyURL"].'",
         ]
     ];
 

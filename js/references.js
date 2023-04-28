@@ -11,6 +11,7 @@ const infoModalBody = document.getElementById('infoModalBody');
 const settingsIcon = document.getElementById('settingsIcon');
 const useCache = document.getElementById('useCache');
 const clearCache = document.getElementById('clearCache');
+const proxyURL = document.getElementById('proxyURL');
 /* Test result elements */
 const testDLMResults = document.getElementById('testDLMResults');
 const testResultsLoadingSpinner = document.getElementById('testResultsLoadingSpinner');
@@ -20,6 +21,7 @@ const moduleDisplayName = document.getElementById('moduleDisplayName');
 const moduleDescription = document.getElementById('moduleDescription');
 const moduleVersion = document.getElementById('moduleVersion');
 const moduleAccountSupport = document.getElementById('moduleAccountSupport');
+const moduleUseProxy = document.getElementById('moduleUseProxy');
 const moduleMaxResults = document.getElementById('moduleMaxResults');
 /* The example search URL and search text form inputs */
 const searchURL = document.getElementById('searchURL');

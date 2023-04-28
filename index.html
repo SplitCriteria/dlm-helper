@@ -13,7 +13,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <div class="row">
+            <div class="row g-2">
                 <div class="col-12">
                     <div class="h5 border-bottom">Cache</div>
                 </div>
@@ -23,6 +23,13 @@
                 </div>
                 <div class="col-6">
                     <button id="clearCache" class="btn btn-warning" type="button" data-bs-toggle="modal" data-bs-target="#infoModal">Clear Cache</button>
+                </div>
+                <div class="col-12">
+                    <div class="h5 border-bottom">WebDriver Proxy</div>
+                </div>
+                <div class="col-12">
+                    <label for="proxyURL" class="form-label">URL</label>
+                    <input id="proxyURL" type="input" class="form-control" placeholder="http://localhost:4445">
                 </div>
             </div>
         </div>
@@ -71,32 +78,36 @@
                     </div>
                     <div class="card-body">
                         <div class="row g-4">
-                            <div class="col-6 col-sm-3 col-md-2">
+                            <div class="col-4 col-sm-4 col-md-4 col-xl-2">
                                 <label for="moduleName" class="form-label">Module Name</label>
                                 <!-- The module name is also used as a unique class name in the search.php file. The pattern
                                      defined here is a limited version of the PHP standard class name pattern: https://www.php.net/manual/en/language.oop5.basic.php -->
                                 <input id="moduleName" name="moduleName" class="form-control" placeholder="MyDLM" pattern="^[a-zA-Z_][a-zA-Z0-9_]*$" required>
                                 <div class="form-text">Unique among all Download Station modules</div>
                             </div>
-                            <div class="col-6 col-sm-3 col-md-2">
+                            <div class="col-4 col-sm-4 col-md-4 col-xl-1">
+                                <label for="moduleVersion" class="form-label">Version</label>
+                                <input id="moduleVersion" name="moduleVersion" class="form-control" placeholder="1.0" required>
+                            </div>
+                            <div class="col-4 col-sm-4 col-md-4 col-xl-2">
                                 <label for="moduleDisplayName" class="form-label">Display Name</label>
                                 <input id="moduleDisplayName" name="moduleDisplayName" class="form-control" placeholder="My DLM" required>
                                 <div class="form-text">Name displayed to user</div>
                             </div>
-                            <div class="col-12 col-sm-6 col-md-3">
+                            <div class="col-12 col-sm-12 col-md-6 col-xl-4">
                                 <label for="moduleDescription" class="form-label">Description</label>
                                 <input id="moduleDescription" name="moduleDescription" class="form-control" placeholder="My DLM for website" required>
                                 <div class="form-text">Description displayed to user</div>
                             </div>
-                            <div class="col-6 col-sm-4 col-md-1">
-                                <label for="moduleVersion" class="form-label">Version</label>
-                                <input id="moduleVersion" name="moduleVersion" class="form-control" placeholder="1.0" required>
-                            </div>
-                            <div class="col-6 col-sm-4 col-md-2">
+                            <div class="col-4 col-sm-4 col-md-2 col-xl-1">
                                 <label for="moduleAccountSupport" class="form-check-label">Account Support</label>
                                 <input id="moduleAccountSupport" name="moduleAccountSupport" type="checkbox" class="form-check-input">
                             </div>
-                            <div class="col-6 col-sm-4 col-md-2">
+                            <div class="col-4 col-sm-4 col-md-2 col-xl-1">
+                                <label for="moduleUseProxy" class="form-check-label">Use WebDriver Proxy</label>
+                                <input id="moduleUseProxy" name="moduleUseProxy" type="checkbox" class="form-check-input">
+                            </div>
+                            <div class="col-4 col-sm-4 col-md-2 col-xl-1">
                                 <label for="moduleMaxResults" class="form-label">Limit Results</label>
                                 <input id="moduleMaxResults" name="maxResults" class="form-control" pattern="\d+">
                                 <div class="form-text">Hard limit search results (use 0 to show all)</div>

@@ -15,13 +15,31 @@ function setupTestDLM() {
             body: data,
             signal: signal
         });
-        const text = await response.text();
+        const json = await response.json();
+        console.log('DLM Test Results: ', json);
         /* Hide the loading spinner */
         testResultsLoadingSpinner.classList.add('d-none');
         /* Load the results into the test modal */
-        testDLMResults.innerHTML = 
-            '<p>Max results artifically limited to '+maxResults+'</p>'
-            + text;
+        if (json) {
+            let testInfo = '';
+            for (const info of json['info']) {
+                testInfo += '<div class="card-text">'+info+'</div>';
+            }
+            testDLMResults.innerHTML = 
+                `<div class="col-12">\
+                    <div class="card">\
+                        <div class="card-header">Test Parameters</div>\
+                        <div class="card-body">\
+                            ${testInfo}\
+                        </div>\
+                    </div>\
+                </div>`;
+            for (const datum of json['data']) {
+                testDLMResults.insertAdjacentHTML('beforeend', datum);
+            }
+        } else {
+            testDLMResults.innerHTML = '<p>No results returned</p>';
+        }
     }
 
     /* Run the test when the test button is clicked */
@@ -62,8 +80,11 @@ function setupTestDLM() {
         data.append("patternDateUsePage", datePatternUsePage.checked);
         data.append("patternDownloadUsePage", downloadPatternUsePage.checked);
         data.append("patternCategoryUsePage", categoryPatternUsePage.checked);
+        /* Pass the proxy settings */
+        data.append("proxyEnable", moduleUseProxy.checked);
+        data.append("proxyURL", proxyURL.value);
         /* Disable the cache */
-        data.append("cache", true);
+        data.append("cache", useCache.checked);
         /* For the test, always limit results */
         data.append("maxResults", maxResults);
         /* Run the test by POST'ing to the php test script */

@@ -1,0 +1,12 @@
+{
+    "name": "webdriver-proxy",
+    "version": "1.0.0",
+    "main": "proxy.js",
+    "scripts": {
+      "start": "node proxy.js"
+    },
+    "dependencies": {
+        "express": "^4.16.1",
+        "selenium-webdriver": "^4.9.0"
+    }
+}

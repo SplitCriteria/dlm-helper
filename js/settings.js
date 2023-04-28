@@ -16,7 +16,7 @@ function setupSettings() {
         localStorage.setItem('use_cache', useCache.checked);
     });
 
-    /* Clear the cache */
+    /* Add a "clear cache" click listener */
     clearCache.addEventListener('click', async () => {
         /* Set the info modal to say that we're clearing the cache */
         infoModalBody.innerHTML = '<p>Clearing the cache...</p>';
@@ -30,6 +30,18 @@ function setupSettings() {
         });
         /* Show the info notice */
         infoModalBody.innerHTML = '<p>Cache cleared!</p>';
+    });
+
+    /* Load the proxy url */
+    let proxyURLSetting = localStorage.getItem('proxy_url');
+    if (proxyURLSetting === null) {
+        proxyURLSetting = "http://localhost:4445";
+        localStorage.setItem('proxy_url', proxyURLSetting);
+    }
+    proxyURL.value = proxyURLSetting;
+    /* Save the proxy URL when it's changed */
+    proxyURL.addEventListener('change', () => {
+        localStorage.setItem('proxy_url', proxyURL.value);
     });
 
     /* Open the settings menu when the settings icon clicked */

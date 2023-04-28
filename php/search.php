@@ -34,6 +34,9 @@ class DLMClass {
 	 * 						useCache
 	 * 							enable (boolean)
 	 * 							directory (string)
+	 * 						proxy
+	 * 							enable (boolean)
+	 * 							url (string)
 	 * 	@return
 	 */
 	function __construct(&$options) {
@@ -56,13 +59,24 @@ class DLMClass {
 	 * 
 	 * @param curl	the cURL object
 	 * @param query	the search string
-	 * @return 		N/A
+	 * @return the final URL (custom -- NOT in the Synology specification)
 	 */
 	public function prepare($curl, $query) {
 		$q = $this->options["query"];
 		/* Create the query URL and add it to the cURL object */
 		$url = $q["domain"].$q["queryPrefix"].urlencode($query).$q["querySuffix"];
-		curl_setopt($curl, CURLOPT_URL, $url);
+		/* If our custom proxy is defined, then use it instead */
+		if (!empty($this->options["proxy"]["enable"])) {
+			curl_setopt($curl, CURLOPT_URL, $this->options["proxy"]["url"]);
+			/* Our custom proxy takes the URL as a POST item */
+			curl_setopt($curl, CURLOPT_POST, true);
+			curl_setopt($curl, CURLOPT_POSTFIELDS, [ "url" => $url ]);
+		} else {
+			/* No proxy? Just use the given URL */
+			curl_setopt($curl, CURLOPT_URL, $url);
+		}
+		/* Return the url */
+		return $url;
 	}
 
 	/**
@@ -127,6 +141,13 @@ class DLMClass {
 	}
 
 	/**
+	 * Returns the results
+	 */
+	public function getResults() {
+		return $this->options['result'];
+	}
+
+	/**
 	 * Uses cURL to fetch additional data at the given path. 
 	 * The domain used is the one provided on object instantiation.
 	 * 
@@ -146,10 +167,19 @@ class DLMClass {
 		curl_setopt($curl, CURLOPT_VERBOSE, true);
 		/* Set a user agent to mimic a real browser */
 		curl_setopt($curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36");
-		/* Add the path to the domain */
-		curl_setopt($curl, CURLOPT_URL, $this->options["query"]["domain"] . $path);
-		/* Get the effective URL to use as a key in the cache */
-		$url = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+		/* Add the path to the domain. However, if our custom proxy
+		   is defined, then use it instead and add the URL to the 
+		   as POST data */
+		$url = $this->options["query"]["domain"].$path;
+		if (!empty($this->options["proxy"]["enable"])) {
+			curl_setopt($curl, CURLOPT_URL, $this->options["proxy"]["url"]);
+			/* Our custom proxy takes the URL as a POST item */
+			curl_setopt($curl, CURLOPT_POST, true);
+			curl_setopt($curl, CURLOPT_POSTFIELDS, [ "url" => $url ]);
+		} else {
+			/* No proxy? Just use the given URL */
+			curl_setopt($curl, CURLOPT_URL, $url);
+		}
 		/* If there's no cache, or it's not stored, then use cURL */
 		if (empty($cache) || !($result = $cache->get($url))) {
 			$result = curl_exec($curl);
@@ -259,7 +289,7 @@ class DLMClass {
 					$title = count($title) > 1 ? $title[1] : $title[0];
 				} else {
 					/* Return an error -- there should be a title found */
-					$plugin->addResult('ERROR: No title found', '', 1, 0, '', '', 0, 0, '');
+					$plugin->addResult('ERROR: search.php, no title pattern', '', 1, 0, '', '', 0, 0, '');
 					return $resultNum;
 				}
 

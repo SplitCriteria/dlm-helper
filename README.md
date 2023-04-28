@@ -4,13 +4,18 @@ DLM Helper is a web-based tool to quickly and easily create, test, and publish D
 <img src="./docs/dlm_configuration.png">
 
 # Installation
-There are two options to use DLM Helper:
-- Use a PHP-enabled webserver (e.g. Synology WebServer) and Git from the command line:
+There are three options to use DLM Helper:
+- Use a PHP-enabled webserver (e.g. Synology WebServer); install from the command line:
     1. Clone the files into your server's root directory
         ```
         git clone https://github.com/SplitCriteria/dlm-helper.git
         ```
-    2. Point your web browser to `http://your.webserver/`
+    2. Install PHP WebDriver dependency (requires <a href="http://getcomposer.org">Composer</a>)
+        ```
+        cd dlm-helper
+        php /your/path/to/composer.phar update
+        ```
+    2. Point your web browser to `http://your.webserver/dlm-helper/`
 - Use Docker from the command line:
     1. Download and run the container
         ```

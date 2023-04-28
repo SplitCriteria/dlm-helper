@@ -75,8 +75,9 @@ if (empty($_POST['url'])) {
 }
 
 /* Create a cache object if requested */
-if (!empty($_POST['cache'])) {
-    $cache = new Cache('../cache');
+if ($_POST['cache'] == "true") {
+    $cacheDir = empty($_POST['cacheDir']) ? '../cache' : $_POST['cacheDir'];
+    $cache = new Cache($cacheDir);
 }
 
 /* Get the effective URL to use as a key in the cache */
@@ -98,7 +99,7 @@ if (empty($cache) || empty($result['data'] = $cache->get($url))) {
     
     /* If one of the responses was not empty then cache the result */
     if (!empty($result) && !empty($cache)) {
-        $cache->put($url, $result);
+        $cache->put($url, $result['data']);
     }
 } else {
     $result['source'] = 'cache';

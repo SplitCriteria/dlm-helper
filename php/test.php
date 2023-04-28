@@ -3,8 +3,6 @@ include_once('./cache.php');
 include_once('./parse_url.php');
 include_once('./search.php');
 
-header('Content-Type: text/html');
-
 /* Parse the url */
 $query = parseURL($_POST['searchURL'], $_POST['searchText']);
 
@@ -41,18 +39,29 @@ $options = [
         "category" => $_POST["patternCategoryUsePage"] == "true"
     ],
     "useCache" => [
-        "enable" => $_POST["cache"],
+        "enable" => $_POST["cache"] == "true",
         "directory" => $_POST["cacheDir"]
+    ],
+    "proxy" => [
+        "enable" => $_POST["proxyEnable"] == "true",
+        "url" => $_POST["proxyURL"]
     ]
 ];
 
 $dlm = new DLMClass($options);
 
+$results = [
+    "info" => [],
+    "data" => []
+];
+
 class DSPlugin {
 
     public function addResult($title, $download, $size, $date, 
             $page, $hash, $seeds, $leeches, $category) {
-        echo '<div class="col-12">
+        global $results;
+        $results['data'][] = 
+            '<div class="col-12">
                 <div class="card">
                     <div class="card-header">'.$title.'</div>
                     <div class="card-body">
@@ -76,21 +85,32 @@ curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
 curl_setopt($curl, CURLOPT_SSL_VERIFYSTATUS, true);
 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
 curl_setopt($curl, CURLOPT_VERBOSE, true);
-$dlm->prepare($curl, $_POST['searchText']);
+/* Custom implementation of prepare returns the URL (a return 
+   value is not specified in the Synology specification) */
+$url = $dlm->prepare($curl, $_POST['searchText']);
 
-/* Get the full URL after the DLM module has prepared it */
-$url = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+$results['info'][] = "URL to get: $url";
 
+/* Create a cache object if desired */
+if ($_POST['cache'] == "true") {
+    $cacheDir = isset($_POST['cacheDir']) ? $_POST['cacheDir'] : '../cache';
+    $cache = new Cache($cacheDir);
+    $results['info'][] = "Using cache in directory '$cacheDir'";
+}
 /* Get the response from the URL source or the cache, if it exists */
-$cache = new Cache('../cache');
-if (!($result = $cache->get($url))) {
+if (empty($cache) || !($result = $cache->get($url))) {
     /* Not cached -- get from the source */
     if ($result = curl_exec($curl)) {
-        /* If there's a good result, cache it */
-        $cache->put($url, $result);
+        /* If there's a good result, adn there's a cache, store it */
+        if (!empty($cache)) {
+            $cache->put($url, $result);
+        }
+        $results['info'][] = "Data received from cURL";
     } else {
-        echo "<p>Unable to get response from $url</p>";
+        $results['info'][] = "No response from '$url'";
     }
+} else {
+    $results['info'][] = "Data is from cache";
 }
 
 /* Close the curl object */
@@ -99,6 +119,16 @@ curl_close($curl);
 /* If we got a good response, then parse the result 
    which will dump the result in HTML */
 if ($result) {
+    $results['source'] = $result;
     $dlm->parse(new DSPlugin(), $result);
 }
+
+/* Catch the DLM options and results (internals of the parse) */
+$results['search.php options'] = $options;
+$results['search.php parse'] = $dlm->getResults();
+
+/* Output the data in JSON format */
+header('Content-Type: application/json');
+echo json_encode($results);
+
 ?>
