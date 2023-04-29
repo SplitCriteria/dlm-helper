@@ -86,8 +86,10 @@ curl_setopt($curl, CURLOPT_SSL_VERIFYSTATUS, true);
 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
 curl_setopt($curl, CURLOPT_VERBOSE, true);
 /* Custom implementation of prepare returns the URL (a return 
-   value is not specified in the Synology specification) */
-$url = $dlm->prepare($curl, $_POST['searchText']);
+   value is not specified in the Synology specification). The
+   search text should be URL encoded, so decode it before 
+   sending to the search class.  */
+$url = $dlm->prepare($curl, urldecode($_POST['searchText']));
 
 $results['info'][] = "URL to get: $url";
 
@@ -101,7 +103,7 @@ if ($_POST['cache'] == "true") {
 if (empty($cache) || !($result = $cache->get($url))) {
     /* Not cached -- get from the source */
     if ($result = curl_exec($curl)) {
-        /* If there's a good result, adn there's a cache, store it */
+        /* If there's a good result, and there's a cache, store it */
         if (!empty($cache)) {
             $cache->put($url, $result);
         }

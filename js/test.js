@@ -9,13 +9,20 @@ function setupTestDLM() {
     async function runTest(data, signal) {
         /* Fetch data from our own fetcher which has its own
            cache */
-        const response = await fetch('./php/test.php', 
-        {
-            method: "POST",
-            body: data,
-            signal: signal
-        });
-        const json = await response.json();
+        let response, json;
+        try {
+            response = await fetch('./php/test.php', 
+            {
+                method: "POST",
+                body: data,
+                signal: signal
+            });
+            json = await response.json();
+        } catch (err) {
+            testResultsLoadingSpinner.classList.add('d-none');
+            testDLMResults.innerHTML = '<p>Error</p><p>'+err+'</p>';
+            throw err;
+        }
         console.log('DLM Test Results: ', json);
         /* Hide the loading spinner */
         testResultsLoadingSpinner.classList.add('d-none');
@@ -88,6 +95,12 @@ function setupTestDLM() {
         /* For the test, always limit results */
         data.append("maxResults", maxResults);
         /* Run the test by POST'ing to the php test script */
-        runTest(data, signal);
+        try {
+            runTest(data, signal);
+        } catch (err) {
+            /* Show an error if the test failed */
+            testResultsLoadingSpinner.classList.add('d-none');
+            testDLMResults.innerHTML = '<p>Error</p><p>'+err+'</p>';
+        }
     });
 }

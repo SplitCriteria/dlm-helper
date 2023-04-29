@@ -12,11 +12,12 @@ async function fetch(
   /* Build a webdriver for chrome and set it to the 
      appropriate server -- the server name is the 
      docker container's name */
-  let driver = new Builder()
-    .usingServer(remote)
-    .forBrowser('chrome')
-    .build();
+  let driver;
   try {
+    driver = new Builder()
+      .usingServer(remote)
+      .forBrowser('chrome')
+      .build();
     /* Get the webpage and pass back the innerHTML of the body */
     console.log('Getting URL: '+url)
     await driver.get(url);
@@ -25,9 +26,12 @@ async function fetch(
     return text;
   } catch (err) {
     console.log('Error: ', err);
+    throw err;
   } finally {
     /* Release the driver */
-    await driver.quit();
+    if (driver) {
+      await driver.quit();
+    }
   }
 }
   

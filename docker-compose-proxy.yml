@@ -1,0 +1,11 @@
+services:
+  dlm-webdriver-proxy:
+    image: splitcriteria/dlm-webdriver-proxy
+    ports:
+      - 4445:4445
+  selenium-webdriver:
+    image: selenium/standalone-chrome
+    ports:
+      - 4444:4444
+      - 7900:7900
+    shm_size: '2gb'

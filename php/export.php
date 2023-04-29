@@ -69,7 +69,7 @@ class '.$_POST['moduleName']. ' {
             "enable" => false
         ],
         "proxy" => [
-            "enable" => '.($_POST["proxyEnable"] == "on" ? 'true' : 'false').',
+            "enable" => '.($_POST["moduleUseProxy"] == "on" ? 'true' : 'false').',
             "url" => "'.$_POST["proxyURL"].'",
         ]
     ];

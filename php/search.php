@@ -241,7 +241,7 @@ class DLMClass {
 					$info[] = "Body pattern (whole) matched";
 				}
 			} else {
-				$info[] = "Body pattern did not match";
+				$errors[] = "Body pattern present, but did not match";
 			}
 		} else {
 			$info[] = "No body pattern present";
@@ -373,7 +373,9 @@ class DLMClass {
 				}
 			}
 		} else {
-			$errors[] = "No items matches found.";
+			$plugin->addResult('ERROR: search.php, no items found', '', 1, 0, '', '', 0, 0, '');
+			$errors[] = "No items matches found";
+			return 1;
 		}
 
 		/* Return the number of results found */
