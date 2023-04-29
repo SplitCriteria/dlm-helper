@@ -12,6 +12,9 @@ const settingsIcon = document.getElementById('settingsIcon');
 const useCache = document.getElementById('useCache');
 const clearCache = document.getElementById('clearCache');
 const proxyURL = document.getElementById('proxyURL');
+const checkProxy = document.getElementById('checkProxy');
+const proxyOnline = document.getElementById('proxyOnline');
+const proxyOffline = document.getElementById('proxyOffline');
 /* Test result elements */
 const testDLMResults = document.getElementById('testDLMResults');
 const testResultsLoadingSpinner = document.getElementById('testResultsLoadingSpinner');

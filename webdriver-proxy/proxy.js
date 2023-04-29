@@ -67,15 +67,27 @@ const server = http.createServer(async (req, res) => {
         res.setHeader('Content-Type', 'text/html');
         res.end(await fetch(post['url'], post['remote']));
       } else {
-        /* If not found, then return an error */
-        req.statusCode = 400;
-        res.setHeader('Content-Type', 'text/html');
-        res.end('<p>Expected "url" POST parameter</p>');
+        /* If not found, then return a status message */
+        req.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        /* Include the body and parsed post parameters */
+        let status = {
+          "status": "ok",
+          "body": body,
+          "post": post,
+          "error": null
+        };
+        res.end(JSON.stringify(status));
       }
     } catch (err) {
       req.statusCode = 400;
-      res.setHeader('Content-Type', 'text/html');
-      res.end("Error:\n------\n"+err+"\n\n\nBody:\n-----\n"+body);
+      res.setHeader('Content-Type', 'application/json');
+      let status = {
+        "status": "error",
+        "body": body,
+        "error": err
+      }
+      res.end(JSON.stringify(status));
     }
   });
 });

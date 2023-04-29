@@ -59,6 +59,10 @@ function setupContentLoader() {
         const data = new FormData();
         data.append("url", searchURL.value);
         data.append("cache", useCache.checked);
+        /* If a proxy is desired, send the proxy URL */
+        if (moduleUseProxy.checked) {
+            data.append("proxy", proxyURL.value);
+        }
 
         /* Remove the old content and show the loading spinners */
         sourceContent.value = '';
@@ -110,6 +114,9 @@ function setupContentLoader() {
             const data = new FormData();
             data.append("url", url);
             data.append("cache", useCache.checked);
+            if (moduleUseProxy.checked) {
+                data.append("proxy", proxyURL.value);
+            }
             /* Load the content */
             loadContent(data, signal, detailsPageSource);
         }

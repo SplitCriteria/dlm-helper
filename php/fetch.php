@@ -15,18 +15,16 @@ include_once('./cache.php');
  * @param url   target to fetch
  * @return html of the webpage on success or false on failure
  */
-function webDriverFetch($url) {
+function webDriverFetch($url, $host = 'http://localhost:4444/wd/hub') {
     try {
-        /* Set the host and port of the webdriver */
-        $host = 'http://localhost:4444/wd/hub';
         $capabilities = DesiredCapabilities::chrome();
         $driver = RemoteWebDriver::create($host, $capabilities);
         $driver->get($url);
         $driver->wait()->until(
             WebDriverExpectedCondition::presenceOfElementLocated(
-                WebDriverBy::cssSelector('body'))
+                WebDriverBy::cssSelector('html'))
         );
-        $result = $driver->findElement(WebDriverBy::cssSelector('body'));
+        $result = $driver->findElement(WebDriverBy::cssSelector('html'));
         /* ->getAttribute('innerHTML') does not work in PHP WebDriver 
            implementation; instead use ->getDOMProperty */
         $result = $result->getDOMProperty('innerHTML');
@@ -85,9 +83,11 @@ $url = $_POST['url'];
 
 /* If there's no cache, or not in the cache, fetch the page from its source */
 if (empty($cache) || empty($result['data'] = $cache->get($url))) {
-    /* Try to get the data from a webdriver resource first then 
-       through curl second */
-    $result['data'] = webDriverFetch($url);
+    /* If desired by the user, try to get the data from a 
+       webdriver resource first then through curl second */
+    if (!empty($_POST["proxy"])) {
+        $result['data'] = webDriverFetch($url);
+    }
     if (empty($result)) {
         $result['data'] = curlFetch($url);
         if (!empty($result)) {

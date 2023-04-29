@@ -299,7 +299,7 @@ class DLMClass {
 					$download = count($download) > 1 ? $download[1] : $download[0];
 				} else {
 					/* Return an error -- there should be a download found */
-					$plugin->addResult('ERROR: No download found', '', 1, 0, '', '', 0, 0, '');
+					$plugin->addResult('ERROR: search.php, no download pattern', '', 1, 0, '', '', 0, 0, '');
 					return $resultNum;
 				}
 				if (!empty($patterns["size"])) {

@@ -44,6 +44,38 @@ function setupSettings() {
         localStorage.setItem('proxy_url', proxyURL.value);
     });
 
+    /** 
+     * Checks the status of the proxy server.
+     */
+    async function checkProxyStatus() {
+        /* Remove both "status" badges */
+        proxyOffline.classList.add('d-none');
+        proxyOnline.classList.add('d-none');
+        try {
+            const data = new FormData();
+            data.append('proxy', proxyURL.value);
+            const response = await fetch('./php/check_proxy.php', 
+            {
+                method: "POST",
+                body: data
+            });
+            /* The proxy should return a json object */
+            const status = await response.json();
+            if (status['status'] == 'ok') {
+                /* Show success badge */
+                proxyOnline.classList.remove('d-none');
+            } else {
+                throw true; 
+            }
+        } catch {
+            /* Show the offline badge if there was an error */
+            proxyOffline.classList.remove('d-none');
+        }
+    }
+
+    checkProxyStatus();
+    checkProxy.addEventListener('click', checkProxyStatus);
+
     /* Open the settings menu when the settings icon clicked */
     settingsIcon.addEventListener('click', () => {
         const settings = new bootstrap.Offcanvas('#settings');
