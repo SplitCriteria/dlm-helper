@@ -35,7 +35,7 @@ function setupSettings() {
     /* Load the proxy url */
     let proxyURLSetting = localStorage.getItem('proxy_url');
     if (proxyURLSetting === null) {
-        proxyURLSetting = "http://localhost:4445";
+        proxyURLSetting = "http://dlm-webdriver-proxy:4445";
         localStorage.setItem('proxy_url', proxyURLSetting);
     }
     proxyURL.value = proxyURLSetting;

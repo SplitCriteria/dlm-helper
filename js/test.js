@@ -4,15 +4,12 @@
  */
 function setupTestDLM() {
 
-    const maxResults = 5;
-
     async function runTest(data, signal) {
         /* Fetch data from our own fetcher which has its own
            cache */
         let response, json;
         try {
-            response = await fetch('./php/test.php', 
-            {
+            response = await fetch('./php/test.php', {
                 method: "POST",
                 body: data,
                 signal: signal
@@ -20,8 +17,8 @@ function setupTestDLM() {
             json = await response.json();
         } catch (err) {
             testResultsLoadingSpinner.classList.add('d-none');
-            testDLMResults.innerHTML = '<p>Error</p><p>'+err+'</p>';
-            throw err;
+            testDLMResults.innerHTML = '<p>Error during test!</p><p>'+err+'</p>';
+            return false;
         }
         console.log('DLM Test Results: ', json);
         /* Hide the loading spinner */
@@ -88,19 +85,13 @@ function setupTestDLM() {
         data.append("patternDownloadUsePage", downloadPatternUsePage.checked);
         data.append("patternCategoryUsePage", categoryPatternUsePage.checked);
         /* Pass the proxy settings */
-        data.append("proxyEnable", moduleUseProxy.checked);
+        data.append("moduleUseProxy", moduleUseProxy.checked);
         data.append("proxyURL", proxyURL.value);
         /* Disable the cache */
         data.append("cache", useCache.checked);
         /* For the test, always limit results */
-        data.append("maxResults", maxResults);
+        data.append("maxResults", Math.min(moduleMaxResults.value, 5));
         /* Run the test by POST'ing to the php test script */
-        try {
-            runTest(data, signal);
-        } catch (err) {
-            /* Show an error if the test failed */
-            testResultsLoadingSpinner.classList.add('d-none');
-            testDLMResults.innerHTML = '<p>Error</p><p>'+err+'</p>';
-        }
+        runTest(data, signal);
     });
 }

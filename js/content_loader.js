@@ -23,18 +23,17 @@ function setupContentLoader() {
         }
         /* Fetch data from our own fetcher which has its own
            cache */
-        const response = await fetch('./php/fetch.php', 
-        {
+        const response = await fetch('./php/fetch.php', {
             method: "POST",
             body: data,
             signal: signal
         });
         /* fetch.php returns a JSON object with content
-           in the 'data' property */
+        in the 'data' property */
         const content = await response.json();
 
         /* Save the content in the destinations and trigger 
-           their input listeners */
+        their input listeners */
         destinations.forEach(dst => { 
             dst.value = content['data'];
             dst.dispatchEvent(new Event('input'));
@@ -69,25 +68,40 @@ function setupContentLoader() {
         sourceContent.setAttribute('disabled', true);
         sourceLoading.classList.remove('invisible');
         sourceMethodBadge.classList.add('invisible');
+        /* Remove any success/danger classes with the badge */
+        sourceMethodBadge.classList.remove('btn-success', 'btn-danger');
 
         /* Start, and await the response of, the content loading process */
-        const content = await loadContent(data, signal, [urlSource, sourceContent]);
+        const content = await loadContent(data, signal, [urlSource, sourceContent])
+            .catch((err) => {
+                /* Set the source to an error message */
+                urlSource.value = sourceContent.value = "Error fetching URL '" +
+                    searchURL.value+"'\n\n"+err;
+                /* Set the content source to an error */
+                return { "source": "Error" };
+            });
 
         /* Remove the loading spinners and set the info badges */
         sourceContent.removeAttribute('disabled');
         sourceLoading.classList.add('invisible');
         switch (content['source']) {
             case 'cache':
+                /* Show a success color on the source content badge */
+                sourceMethodBadge.classList.add('btn-success');
                 sourceMethodBadge.innerText = 'From Cache';
                 break;
             case 'webdriver':
+                sourceMethodBadge.classList.add('btn-success');
                 sourceMethodBadge.innerText = 'From WebDriver';
                 break;
             case 'curl':
+                sourceMethodBadge.classList.add('btn-success');
                 sourceMethodBadge.innerText = 'From cURL';
                 break;
             default:
-                sourceMethodBadge.innerText = 'From Unknown';
+                /* Show a danger color for unknown sources (usually errors) */
+                sourceMethodBadge.classList.add('btn-danger');
+                sourceMethodBadge.innerText = content['source'];
         }
         sourceMethodBadge.classList.remove('invisible');
 
@@ -97,7 +111,7 @@ function setupContentLoader() {
        page and store it for other dependent patterns to match with 
        when the user clicks the "use page" checkbox */
     let pageDetailsURL = null;
-    pageMatches.addEventListener('change', () => {
+    pageMatches.addEventListener('change', async () => {
         /* Create an abort controller to stop the 
         request if necessary */
         const abortController = new AbortController();
@@ -118,7 +132,13 @@ function setupContentLoader() {
                 data.append("proxy", proxyURL.value);
             }
             /* Load the content */
-            loadContent(data, signal, detailsPageSource);
+            await loadContent(data, signal, detailsPageSource)
+                .catch((err) => {
+                    const msg = "Error loading details page '"+pageDetailsURL+"'\n"+err;
+                    detailsPageSource.value = msg;
+                    console.log(msg);
+                    return;
+                });
         }
     });
 }

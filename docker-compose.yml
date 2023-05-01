@@ -9,7 +9,7 @@ services:
       - 4445:4445
   selenium-webdriver:
     image: selenium/standalone-chrome
+    shm_size: 2gb
     ports:
       - 4444:4444
       - 7900:7900
-    shm_size: '2gb'

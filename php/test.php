@@ -13,7 +13,7 @@ $options = [
         "queryPrefix" => $query["prefix"],
         "querySuffix" => $query["suffix"]
     ],
-    "maxResults" => $_POST["maxResults"],
+    "maxResults" => intval($_POST["maxResults"]),
     "verbose" => true,
     "patterns" => [
         "body" => $_POST["patternBody"],
@@ -43,7 +43,7 @@ $options = [
         "directory" => $_POST["cacheDir"]
     ],
     "proxy" => [
-        "enable" => $_POST["proxyEnable"] == "true",
+        "enable" => $_POST["moduleUseProxy"] == "true",
         "url" => $_POST["proxyURL"]
     ]
 ];
@@ -103,6 +103,16 @@ if ($_POST['cache'] == "true") {
 if (empty($cache) || !($result = $cache->get($url))) {
     /* Not cached -- get from the source */
     if ($result = curl_exec($curl)) {
+        /* If the webdriver proxy was used, then the result is a JSON
+           object with the data saved as a value under the URL key */
+        if ($options['proxy']['enable']) {
+            $result = json_decode($result, true);
+            if ($result['status'] == 'error') {
+                $result = $result['error'];
+            } else {
+                $result = $result[$url];
+            }
+        }
         /* If there's a good result, and there's a cache, store it */
         if (!empty($cache)) {
             $cache->put($url, $result);

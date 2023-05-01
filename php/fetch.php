@@ -28,9 +28,9 @@ function webDriverFetch($url, $host = 'http://localhost:4444/wd/hub') {
         /* ->getAttribute('innerHTML') does not work in PHP WebDriver 
            implementation; instead use ->getDOMProperty */
         $result = $result->getDOMProperty('innerHTML');
-    } catch(Exception $e) {
+    } catch (Exception $e) {
         /* Something didn't work -- just return false */
-        return false;
+        return json_encode($e);
     } finally {
         /* Quit the session */
         if ($driver) {

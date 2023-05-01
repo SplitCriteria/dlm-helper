@@ -46,7 +46,7 @@
                             </span>     
                         </label>
                         <div class="row gx-2">
-                            <div class="col-8">
+                            <div class="col-8" data-bs-toggle="tooltip" data-bs-title="If installed using `docker-compose up -d` use `http://dlm-webdriver-proxy:4445` otherwise, use `http://localhost:4445`">
                                 <input id="proxyURL" name="proxyURL" type="input" class="form-control" placeholder="http://localhost:4445">
                             </div>
                             <div class="col-4">
@@ -131,7 +131,7 @@
                                 </div>
                                 <div class="col-4 col-sm-4 col-md-2 col-xl-1">
                                     <label for="moduleMaxResults" class="form-label">Limit Results</label>
-                                    <input id="moduleMaxResults" name="maxResults" class="form-control" pattern="\d+">
+                                    <input id="moduleMaxResults" name="moduleMaxResults" class="form-control" pattern="\d+">
                                     <div class="form-text">Hard limit search results (use 0 to show all)</div>
                                 </div>
                             </div>

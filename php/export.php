@@ -40,7 +40,7 @@ class '.$_POST['moduleName']. ' {
             "queryPrefix" => "'.$query["prefix"].'",
             "querySuffix" => "'.$query["suffix"].'",
         ],
-        "maxResults" => '.$_POST["maxResults"].',
+        "maxResults" => '.intval($_POST["moduleMaxResults"]).',
         "verbose" => false,
         "patterns" => [
             "body" => "'.str_replace('"', '\"', $_POST["patternBody"]).'",
@@ -70,7 +70,7 @@ class '.$_POST['moduleName']. ' {
         ],
         "proxy" => [
             "enable" => '.($_POST["moduleUseProxy"] == "on" ? 'true' : 'false').',
-            "url" => "'.$_POST["proxyURL"].'",
+            "url" => "http://localhost:4445",
         ]
     ];
 
