@@ -76,6 +76,7 @@ Support for private trackers, which require a username/password login, is now in
     1. Click Add and select your DLM
     2. Click Edit to add your username and password, then Verify to ensure the login works (this calls `VerifyAccount` in `search.php`)
 
-## Debugging
+## Tips
 - Error logs can be found at `/var/log/downloadstation.log`
 - Username/password for accounts hashed/stored at `/usr/syno/etc/packages/DownloadStation/download/btsearch.conf`
+- Default plugins are located at `/volume[X]/@appstore/DownloadStation/btsearch/plugins/` where X is the volume # (e.g. 1)
