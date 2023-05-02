@@ -15,7 +15,9 @@ include_once('./cache.php');
  * @param url   target to fetch
  * @return html of the webpage on success or false on failure
  */
-function webDriverFetch($url, $host = 'http://localhost:4444/wd/hub') {
+function webDriverFetch($url, $host = 'http://localhost:4444') {
+    /* Add the path to the selenium webdriver domain */
+    $host = $host.'/wd/hub';
     try {
         $capabilities = DesiredCapabilities::chrome();
         $driver = RemoteWebDriver::create($host, $capabilities);
@@ -30,14 +32,15 @@ function webDriverFetch($url, $host = 'http://localhost:4444/wd/hub') {
         $result = $result->getDOMProperty('innerHTML');
     } catch (Exception $e) {
         /* Something didn't work -- just return false */
-        return json_encode($e);
+        return false;
     } finally {
         /* Quit the session */
         if ($driver) {
             $driver->quit();
         }
     }
-    return $result;
+    /* Add the HTML tags back onto the result */
+    return "<html>$result</html>";
 }
 
 /**
@@ -86,7 +89,7 @@ if (empty($cache) || empty($result['data'] = $cache->get($url))) {
     /* If desired by the user, try to get the data from a 
        webdriver resource first then through curl second */
     if (!empty($_POST["proxy"])) {
-        $result['data'] = webDriverFetch($url);
+        $result['data'] = webDriverFetch($url, $_POST["webdriver"]);
     }
     if (empty($result)) {
         $result['data'] = curlFetch($url);

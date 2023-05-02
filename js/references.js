@@ -15,6 +15,10 @@ const proxyURL = document.getElementById('proxyURL');
 const checkProxy = document.getElementById('checkProxy');
 const proxyOnline = document.getElementById('proxyOnline');
 const proxyOffline = document.getElementById('proxyOffline');
+const webdriverURL = document.getElementById('webdriverURL');
+const checkWebdriver = document.getElementById('checkWebdriver');
+const webdriverOnline = document.getElementById('webdriverOnline');
+const webdriverOffline = document.getElementById('webdriverOffline');
 /* Test result elements */
 const testDLMResults = document.getElementById('testDLMResults');
 const testResultsLoadingSpinner = document.getElementById('testResultsLoadingSpinner');

@@ -71,7 +71,7 @@ async function fetch(
       await driver.quit();
     }
   }
-  return JSON.stringify(text);
+  return text;
 }
   
 const http = require('http');
@@ -92,7 +92,6 @@ const server = http.createServer(async (req, res) => {
   /* Add the end event, convert the body */
   req.on('end', async () => {
     let post = { };
-    res.setHeader('Content-Type', 'application/json');
     /* Extract the request from the POST request (form data in body) */
     try {
       const matches = body.matchAll(/form-data; name="([^"]*)"\s*([^\r\n]*)/g);
@@ -105,6 +104,7 @@ const server = http.createServer(async (req, res) => {
       /* Oops, an error decoding the POST, return an error
          500 -- internal server error */
       res.statusCode = 400;
+      res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify({
         "status": "error",
         "request": {
@@ -121,6 +121,7 @@ const server = http.createServer(async (req, res) => {
       if (!urls) {
         /* Return an error for the incorrect URLs passed */
         res.statusCode = 400;
+        res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
           "status": "error",
           "request": {
@@ -136,12 +137,18 @@ const server = http.createServer(async (req, res) => {
         .then((text) => {
           /* Send the response as HTML */
           res.statusCode = 200;
-          res.end(text);
+          res.setHeader('Content-Type', 'text/html');
+          /* Restore the HTML tags which also separate multiple URLs */
+          for (const [url, innerHTML] of Object.entries(text)) {
+            res.write('<html>'+innerHTML+'</html>');
+          }
+          res.end();
           return;
         })
         .catch((err) => {
           /* Send an error if fetch didn't work */
           res.statusCode = 400;
+          res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({
             "status": "error",
             "request": {
@@ -155,6 +162,7 @@ const server = http.createServer(async (req, res) => {
     } else {
       /* If no URL given just return a status message */
       req.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
       /* Include the body and parsed post parameters */
       res.end(JSON.stringify({
         "status": "ok",

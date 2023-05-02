@@ -183,8 +183,14 @@ class DLMClass {
 		/* If there's no cache, or it's not stored, then use cURL */
 		if (empty($cache) || !($result = $cache->get($url))) {
 			$result = curl_exec($curl);
+			$status = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+			/* cURL responses from the proxy with errors are JSON encoded */
+			if ($this->options["proxy"]["enable"] && $status != 200) {
+				/* Decode it and extract the error */
+				$result = json_decode($result, true)['error'];
+			}
 			/* If the cache object exists, then cache the result */
-			if (!empty($cache)) {
+			if ($status == 200 && !empty($cache)) {
 				$cache->put($url, $result);
 			}
 		}
@@ -287,6 +293,10 @@ class DLMClass {
 					/* If there was a grouping matches, use that (1st match)
 					   otherwise use the whole match (0th match) */;
 					$title = count($title) > 1 ? $title[1] : $title[0];
+					/* Check that the title is present -- it must be */
+					$plugin->addResult('ERROR: search.php, no title matched', '', 1, 0, '', '', 0, 0, '');
+					return $resultNum;
+
 				} else {
 					/* Return an error -- there should be a title found */
 					$plugin->addResult('ERROR: search.php, no title pattern', '', 1, 0, '', '', 0, 0, '');
@@ -297,6 +307,8 @@ class DLMClass {
 					preg_match($patterns["download"], 
 						$usePage["download"] ? $details : $item, $download);
 					$download = count($download) > 1 ? $download[1] : $download[0];
+					$plugin->addResult('ERROR: search.php, no download matched', '', 1, 0, '', '', 0, 0, '');
+					return $resultNum;
 				} else {
 					/* Return an error -- there should be a download found */
 					$plugin->addResult('ERROR: search.php, no download pattern', '', 1, 0, '', '', 0, 0, '');

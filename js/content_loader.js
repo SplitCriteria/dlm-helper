@@ -58,9 +58,10 @@ function setupContentLoader() {
         const data = new FormData();
         data.append("url", searchURL.value);
         data.append("cache", useCache.checked);
-        /* If a proxy is desired, send the proxy URL */
+        /* If a proxy is desired, send the proxy & webdriver URL */
         if (moduleUseProxy.checked) {
             data.append("proxy", proxyURL.value);
+            data.append("webdriver", webdriverURL.value);
         }
 
         /* Remove the old content and show the loading spinners */

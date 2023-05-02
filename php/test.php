@@ -103,18 +103,15 @@ if ($_POST['cache'] == "true") {
 if (empty($cache) || !($result = $cache->get($url))) {
     /* Not cached -- get from the source */
     if ($result = curl_exec($curl)) {
-        /* If the webdriver proxy was used, then the result is a JSON
-           object with the data saved as a value under the URL key */
-        if ($options['proxy']['enable']) {
-            $result = json_decode($result, true);
-            if ($result['status'] == 'error') {
-                $result = $result['error'];
-            } else {
-                $result = $result[$url];
-            }
+        $status = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+        /* If the webdriver proxy was used, then check the response
+           code for an error. If an error is present, then the response
+           is in JSON format */
+        if ($options['proxy']['enable'] && $status != 200) {
+            $result['error'] = json_decode($result, true)['error'];
         }
         /* If there's a good result, and there's a cache, store it */
-        if (!empty($cache)) {
+        if ($status == 200 && !empty($cache)) {
             $cache->put($url, $result);
         }
         $results['info'][] = "Data received from cURL";

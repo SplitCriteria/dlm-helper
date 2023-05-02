@@ -87,6 +87,7 @@ function setupTestDLM() {
         /* Pass the proxy settings */
         data.append("moduleUseProxy", moduleUseProxy.checked);
         data.append("proxyURL", proxyURL.value);
+        data.append("webdriverURL", webdriverURL.value);
         /* Disable the cache */
         data.append("cache", useCache.checked);
         /* For the test, always limit results */

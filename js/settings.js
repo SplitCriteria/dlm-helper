@@ -76,6 +76,50 @@ function setupSettings() {
     checkProxyStatus();
     checkProxy.addEventListener('click', checkProxyStatus);
 
+    /* Load the webdriver url */
+    let webdriverURLSetting = localStorage.getItem('webdriver_url');
+    if (webdriverURLSetting === null) {
+        webdriverURLSetting = "http://selenium-webdriver:4444";
+        localStorage.setItem('webdriver_url', webdriverURLSetting);
+    }
+    webdriverURL.value = webdriverURLSetting;
+    /* Save the webdriver URL when it's changed */
+    webdriverURL.addEventListener('change', () => {
+        localStorage.setItem('webdriver_url', webdriverURL.value);
+    });
+
+    /** 
+     * Checks the status of the webdriver server.
+     */
+    async function checkWebdriverStatus() {
+        /* Remove both "status" badges */
+        webdriverOffline.classList.add('d-none');
+        webdriverOnline.classList.add('d-none');
+        try {
+            const data = new FormData();
+            data.append('webdriver', webdriverURL.value);
+            const response = await fetch('./php/check_webdriver.php', 
+            {
+                method: "POST",
+                body: data
+            });
+            /* The proxy should return a json object */
+            const status = await response.json();
+            if (status['value']['ready'] === true) {
+                /* Show success badge */
+                webdriverOnline.classList.remove('d-none');
+            } else {
+                throw true; 
+            }
+        } catch {
+            /* Show the offline badge if there was an error */
+            webdriverOffline.classList.remove('d-none');
+        }
+    }
+
+    checkWebdriverStatus();
+    checkWebdriver.addEventListener('click', checkWebdriverStatus); 
+
     /* Open the settings menu when the settings icon clicked */
     settingsIcon.addEventListener('click', () => {
         const settings = new bootstrap.Offcanvas('#settings');
