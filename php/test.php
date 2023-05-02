@@ -97,22 +97,22 @@ $results['info'][] = "URL to get: $url";
 if ($_POST['cache'] == "true") {
     $cacheDir = isset($_POST['cacheDir']) ? $_POST['cacheDir'] : '../cache';
     $cache = new Cache($cacheDir);
-    $results['info'][] = "Using cache in directory '$cacheDir'";
+    $results['info'][] = "Cache directory '$cacheDir'";
 }
 /* Get the response from the URL source or the cache, if it exists */
-if (empty($cache) || !($result = $cache->get($url))) {
+if (empty($cache) || empty($html = $cache->get($url))) {
     /* Not cached -- get from the source */
-    if ($result = curl_exec($curl)) {
+    if ($html = curl_exec($curl)) {
         $status = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
         /* If the webdriver proxy was used, then check the response
            code for an error. If an error is present, then the response
            is in JSON format */
         if ($options['proxy']['enable'] && $status != 200) {
-            $result['error'] = json_decode($result, true)['error'];
+            $results['error'] = json_decode($html, true)['error'];
         }
         /* If there's a good result, and there's a cache, store it */
         if ($status == 200 && !empty($cache)) {
-            $cache->put($url, $result);
+            $cache->put($url, $html);
         }
         $results['info'][] = "Data received from cURL";
     } else {
@@ -127,9 +127,9 @@ curl_close($curl);
 
 /* If we got a good response, then parse the result 
    which will dump the result in HTML */
-if ($result) {
-    $results['source'] = $result;
-    $dlm->parse(new DSPlugin(), $result);
+if (!empty($html)) {
+    $results['source'] = $html;
+    $dlm->parse(new DSPlugin(), $html);
 }
 
 /* Catch the DLM options and results (internals of the parse) */

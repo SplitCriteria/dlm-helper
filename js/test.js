@@ -91,7 +91,12 @@ function setupTestDLM() {
         /* Disable the cache */
         data.append("cache", useCache.checked);
         /* For the test, always limit results */
-        data.append("maxResults", Math.min(moduleMaxResults.value, 5));
+        $maxResults = Math.min(moduleMaxResults.value, 5);
+        /* Zero means unlimited results, so set it to our artifical limit */
+        if ($maxResults == 0) {
+            $maxResults = 5;
+        }
+        data.append("maxResults", $maxResults);
         /* Run the test by POST'ing to the php test script */
         runTest(data, signal);
     });

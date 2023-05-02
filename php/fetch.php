@@ -16,8 +16,6 @@ include_once('./cache.php');
  * @return html of the webpage on success or false on failure
  */
 function webDriverFetch($url, $host = 'http://localhost:4444') {
-    /* Add the path to the selenium webdriver domain */
-    $host = $host.'/wd/hub';
     try {
         $capabilities = DesiredCapabilities::chrome();
         $driver = RemoteWebDriver::create($host, $capabilities);
@@ -91,7 +89,7 @@ if (empty($cache) || empty($result['data'] = $cache->get($url))) {
     if (!empty($_POST["proxy"])) {
         $result['data'] = webDriverFetch($url, $_POST["webdriver"]);
     }
-    if (empty($result)) {
+    if (empty($result['data'])) {
         $result['data'] = curlFetch($url);
         if (!empty($result)) {
             $result['source'] = 'curl';
@@ -101,7 +99,7 @@ if (empty($cache) || empty($result['data'] = $cache->get($url))) {
     }
     
     /* If one of the responses was not empty then cache the result */
-    if (!empty($result) && !empty($cache)) {
+    if (!empty($result['data']) && !empty($cache)) {
         $cache->put($url, $result['data']);
     }
 } else {

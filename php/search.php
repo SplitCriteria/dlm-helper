@@ -294,9 +294,10 @@ class DLMClass {
 					   otherwise use the whole match (0th match) */;
 					$title = count($title) > 1 ? $title[1] : $title[0];
 					/* Check that the title is present -- it must be */
-					$plugin->addResult('ERROR: search.php, no title matched', '', 1, 0, '', '', 0, 0, '');
-					return $resultNum;
-
+					if (empty($title)) {
+						$plugin->addResult('ERROR: search.php, no title matched', '', 1, 0, '', '', 0, 0, '');
+						return $resultNum;
+					}
 				} else {
 					/* Return an error -- there should be a title found */
 					$plugin->addResult('ERROR: search.php, no title pattern', '', 1, 0, '', '', 0, 0, '');
@@ -307,8 +308,10 @@ class DLMClass {
 					preg_match($patterns["download"], 
 						$usePage["download"] ? $details : $item, $download);
 					$download = count($download) > 1 ? $download[1] : $download[0];
-					$plugin->addResult('ERROR: search.php, no download matched', '', 1, 0, '', '', 0, 0, '');
-					return $resultNum;
+					if (empty($download)) {
+						$plugin->addResult('ERROR: search.php, no download matched', '', 1, 0, '', '', 0, 0, '');
+						return $resultNum;
+					}
 				} else {
 					/* Return an error -- there should be a download found */
 					$plugin->addResult('ERROR: search.php, no download pattern', '', 1, 0, '', '', 0, 0, '');
