@@ -8,7 +8,7 @@ There are a couple options to install DLM Helper:
 1. **Includes DLM WebDriver Proxy for more versatile DLMs.** Use Docker from the command line to launch DLM Helper with WebDriver Proxy included:
     1. Clone this repository and use Docker Compose to install/launch
         ```
-        git clone http://github.com/SplitCriteria/dlm-helper.git
+        git clone https://github.com/SplitCriteria/dlm-helper.git
         sudo docker-compose up -d
         ```
     2. Go to `http://your.synology.ip:3000`
